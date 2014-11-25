@@ -57,5 +57,16 @@ class Stor(object):
         serial_data = serial_fun(data)
         stor['fp'].seek(0, 2)
         start = stor['fp'].tell()
-        stor.write(serial_data)
+        stor['fp'].write(serial_data)
         return start, len(serial_data)
+
+    def read(self, table_entry, start, size, serial=None):
+        '''
+        Read in the data
+        '''
+        stor = self.fn_from_table(table_entry)
+        stor['fp'].seek(start)
+        raw = stor['fp'].read(size)
+        serial = serial if serial else self.serial
+        serial_fun = getattr(self, '{0}_load'.format(serial))
+        return serial_fun(raw)
