@@ -205,9 +205,9 @@ class HDHT(object):
         Write a table entry
         '''
         table = self.get_hash_table(table_entry['tfn'])
-        t_str = struct.pack(table.fmt, c_key, prev)
-        table.seek(table_entry['pos'])
-        table.write(t_str)
+        t_str = struct.pack(table['fmt'], c_key, prev)
+        table['fp'].seek(table_entry['pos'])
+        table['fp'].write(t_str)
 
     def write_data_entry(
             self,
