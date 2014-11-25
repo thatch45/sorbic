@@ -15,7 +15,8 @@ DB_OPTS = (
         'key_hash',
         'fmt',
         'fmt_map',
-        'header_len')
+        'header_len',
+        'serial')
 
 
 class DB(object):
@@ -39,6 +40,7 @@ class DB(object):
         self.fmt = fmt
         self.fmt_map = fmt_map
         self.header_len = header_len
+        self.serial = serial
         self._get_db_meta()
         self.storage = sorbic.stor.Stor(self.root)
         self.index = sorbic.ind.hdht.HDHT(
