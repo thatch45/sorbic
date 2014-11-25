@@ -73,20 +73,6 @@ class HDHT(object):
         '''
         return len(struct.pack(self.fmt, '0' * self.key_size, 1))
 
-    def raw_crypt_key(self, key):
-        '''
-        Return the crypted key
-        '''
-        return self.crypt_func(key.lstrip(self.key_delim)).digest()
-
-    def entry_root(self, key):
-        '''
-        Return the root directory to be used for the entry
-        '''
-        key = key.strip(self.key_delim)
-        root = key[:key.rfind(self.key_delim)].replace(self.key_delim, os.sep)
-        return os.path.join(self.root, root)
-
     def _open_hash_table(self, fn_):
         '''
         Return the header data for the table at the given location, open if
@@ -112,6 +98,20 @@ class HDHT(object):
                         )
                 self.tables[fn_] = header
                 return header
+
+    def raw_crypt_key(self, key):
+        '''
+        Return the crypted key
+        '''
+        return self.crypt_func(key.lstrip(self.key_delim)).digest()
+
+    def entry_root(self, key):
+        '''
+        Return the root directory to be used for the entry
+        '''
+        key = key.strip(self.key_delim)
+        root = key[:key.rfind(self.key_delim)].replace(self.key_delim, os.sep)
+        return os.path.join(self.root, root)
 
     def get_hash_table(self, fn_):
         '''
@@ -196,6 +196,7 @@ class HDHT(object):
             ret = self._table_map(comps, table['fmt_map'])
             ret['pos'] = pos
             ret['tfn'] = table['fp'].name
+            ret['num'] = num
             if ret['key'] is None:
                 return ret
             if ret['key'] == c_key:
