@@ -213,15 +213,17 @@ class HDHT(object):
         table = self.tables[table_entry['tfn']]
         prev = table_entry['prev']
         while True:
-            table['tp'].seek(prev)
+            table['fp'].seek(prev)
             data_len = struct.unpack('>H', table['fp'].read(2))
-            data_entry = msgpack.loads(table['fp'].read(data_len))
+            data_entry = msgpack.loads(table['fp'].read(data_len[0]))
             if id_:
                 if data_entry['id'] == id_:
                     return data_entry
                 if data_entry['prev']:
                     prev = data_entry['prev']
                     continue
+                return data_entry
+            else:
                 return data_entry
 
     def write_table_entry(self, table_entry, c_key, prev):
