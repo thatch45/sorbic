@@ -35,7 +35,7 @@ setup(name=NAME,
           ],
       packages=[
           'sorbic',
-          'sorbic.index',
+          'sorbic.ind',
           'sorbic.stor',
           'sorbic.utils',
           ]
