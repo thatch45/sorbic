@@ -18,7 +18,7 @@ import libnacl.blake
 HEADER_DELIM = '_||_||_'
 
 
-def _calc_pos(self, c_key, hash_limit, b_size, header_len):
+def _calc_pos(c_key, hash_limit, b_size, header_len):
     '''
     Calculate the hash position in the table file
     '''
@@ -85,7 +85,7 @@ class HDHT(object):
         '''
         key = key.strip(self.key_delim)
         root = key[:key.rfind(self.key_delim)].replace(self.key_delim, os.sep)
-        os.path.join(self.root, root)
+        return os.path.join(self.root, root)
 
     def _open_hash_table(self, fn_):
         '''
@@ -124,7 +124,7 @@ class HDHT(object):
             os.makedirs(dirname)
         header = {
                 'hash': self.key_hash,
-                'h_limit': self.hash_limit,
+                'hash_limit': self.hash_limit,
                 'header_len': self.header_len,
                 'fmt': self.fmt,
                 'bucket_size': self.bucket_size,
@@ -193,7 +193,7 @@ class HDHT(object):
                 comps = (None, None)
             ret = self._table_map(comps, table['fmt_map'])
             ret['pos'] = pos
-            ret['tfn'] = table.name
+            ret['tfn'] = table['fp'].name
             if ret['key'] is None:
                 return ret
             if ret['key'] == c_key:
@@ -204,7 +204,7 @@ class HDHT(object):
         '''
         Write a table entry
         '''
-        table = self.get_hash_table[table_entry['tfn']]
+        table = self.get_hash_table(table_entry['tfn'])
         t_str = struct.pack(table.fmt, c_key, prev)
         table.seek(table_entry['pos'])
         table.write(t_str)
@@ -221,9 +221,8 @@ class HDHT(object):
         '''
         Write a data entry
         '''
-        table = self.get_hash_table[table_entry['tfn']]
+        table = self.get_hash_table(table_entry['tfn'])
         raw = self.data_entry(
-                self,
                 c_key,
                 id_,
                 start,
