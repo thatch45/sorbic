@@ -36,14 +36,3 @@ def gen_rev():
     '''
     r_time = time.time() - STD_EPOCH
     return struct.pack('>Q', r_time * 1000000)
-
-
-def get_hash_data(key_hash):
-    '''
-    Return the key hash function and the hash size
-    '''
-    if hasattr(hashlib, key_hash):
-        func = getattr(hashlib, key_hash)
-        size = len(func('some garbage').hexdigest())
-        return func, size
-    raise ValueError('Hash not available')
