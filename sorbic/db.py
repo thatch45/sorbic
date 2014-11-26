@@ -89,3 +89,10 @@ class DB(object):
                 size,
                 type_,
                 **kwargs)
+
+    def get(self, key, id_):
+        '''
+        Retrive an entry
+        '''
+        entries = self.index.get_data_entry(key, id_)
+        return self.storage.read(entries['table'], entries['data'])

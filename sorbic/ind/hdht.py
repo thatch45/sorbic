@@ -207,12 +207,14 @@ class HDHT(object):
         '''
         Get the data entry for the given key
         '''
+        ret = {}
         c_key = self.raw_crypt_key(key)
         table_entry = self.get_table_entry(key, c_key)
         if not table_entry['key']:
             return None
         table = self.tables[table_entry['tfn']]
         prev = table_entry['prev']
+        ret['table'] = table_entry
         while True:
             table['fp'].seek(prev)
             data_len = struct.unpack('>H', table['fp'].read(2))
@@ -223,9 +225,11 @@ class HDHT(object):
                 if data_entry['prev']:
                     prev = data_entry['prev']
                     continue
-                return data_entry
+                ret['data'] = data_entry
+                return ret
             else:
-                return data_entry
+                ret['data'] = data_entry
+                return ret
 
     def write_table_entry(self, table_entry, c_key, prev):
         '''
