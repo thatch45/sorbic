@@ -41,7 +41,7 @@ class Stor(object):
             return self.stores[sfn]
         try:
             fp_ = io.open(sfn, 'r+b')
-        except OSError:
+        except (OSError, IOError):
             fp_ = io.open(sfn, 'w+b')
         stor = {'fp': fp_}
         self.stores[sfn] = stor
