@@ -6,6 +6,7 @@ import os
 import io
 # Import sorbic libs
 import sorbic.ind.hdht
+import sorbic.stor
 # Import third party libs
 import msgpack
 
@@ -42,7 +43,7 @@ class DB(object):
         self.header_len = header_len
         self.serial = serial
         self._get_db_meta()
-        self.storage = sorbic.stor.Stor(self.root)
+        self.storage = sorbic.stor.Stor(self.root, serial)
         self.index = sorbic.ind.hdht.HDHT(
                 self.root,
                 self.key_delim,
@@ -65,6 +66,8 @@ class DB(object):
         for entry in DB_OPTS:
             meta[entry] = meta.get(entry, getattr(self, entry))
             setattr(self, entry, meta[entry])
+        if not os.path.isdir(self.root):
+            os.makedirs(self.root)
         with io.open(db_meta, 'w+b') as fp_:
             fp_.write(msgpack.dumps(meta))
 
@@ -76,9 +79,7 @@ class DB(object):
         table_entry = self.index.get_table_entry(key, c_key)
         start, size = self.storage.write(
                 table_entry,
-                key,
                 data,
-                type_,
                 serial)
         self.index.commit(
                 table_entry,
@@ -90,9 +91,13 @@ class DB(object):
                 type_,
                 **kwargs)
 
-    def get(self, key, id_):
+    def get(self, key, id_=None):
         '''
         Retrive an entry
         '''
         entries = self.index.get_data_entry(key, id_)
-        return self.storage.read(entries['table'], entries['data'])
+        return self.storage.read(
+                entries['table'],
+                entries['data']['st'],
+                entries['data']['sz'],
+                self.serial)
