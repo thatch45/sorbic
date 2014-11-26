@@ -3,7 +3,7 @@
 # Import python libs
 import os
 import sys
-# Import maras libs
+# Import sorbic libs
 import sorbic
 
 if 'USE_SETUPTOOLS' in os.environ or 'setuptools' in sys.modules:
