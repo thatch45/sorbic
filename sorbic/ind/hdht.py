@@ -110,6 +110,8 @@ class HDHT(object):
         Return the root directory to be used for the entry
         '''
         key = key.strip(self.key_delim)
+        if self.key_delim not in key:
+            return self.root
         root = key[:key.rfind(self.key_delim)].replace(self.key_delim, os.sep)
         return os.path.join(self.root, root)
 
