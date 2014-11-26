@@ -60,5 +60,10 @@ class TestDB(unittest.TestCase):
         db = sorbic.db.DB(root)
         data = {1:2}
         key = 'somekey'
-        entry = db.insert(key, data)
-        db.get(key, entry['id'])
+        entries = []
+        for num in range(10):
+            data = {1: num}
+            entry = db.insert(key, data)
+            entries.append({'entry': entry, 'data': data})
+        for entry in entries:
+            self.assertEqual(db.get(key, entry['entry']['id']), entry['data'])

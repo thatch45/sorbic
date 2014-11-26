@@ -225,8 +225,8 @@ class HDHT(object):
             if id_:
                 if data_entry['id'] == id_:
                     return ret
-                if data_entry['prev']:
-                    prev = data_entry['prev']
+                if data_entry['p']:
+                    prev = data_entry['p']
                     continue
                 return ret
             else:
