@@ -162,7 +162,7 @@ class HDHT(object):
             entry['id'] = id_
         packed = msgpack.dumps(entry)
         p_len = struct.pack('>H', len(packed))
-        return '{0}{1}'.format(p_len, packed)
+        return '{0}{1}'.format(p_len, packed), entry
 
     def _table_map(self, comps, fmt_map):
         '''
@@ -221,16 +221,15 @@ class HDHT(object):
             table['fp'].seek(prev)
             data_len = struct.unpack('>H', table['fp'].read(2))
             data_entry = msgpack.loads(table['fp'].read(data_len[0]))
+            ret['data'] = data_entry
             if id_:
                 if data_entry['id'] == id_:
-                    return data_entry
+                    return ret
                 if data_entry['prev']:
                     prev = data_entry['prev']
                     continue
-                ret['data'] = data_entry
                 return ret
             else:
-                ret['data'] = data_entry
                 return ret
 
     def write_table_entry(self, table_entry, c_key, prev):
@@ -255,7 +254,7 @@ class HDHT(object):
         Write a data entry
         '''
         table = self.get_hash_table(table_entry['tfn'])
-        raw = self.data_entry(
+        raw, entry = self.data_entry(
                 c_key,
                 id_,
                 start,
@@ -266,7 +265,7 @@ class HDHT(object):
         table['fp'].seek(0, 2)
         prev = table['fp'].tell()
         table['fp'].write(raw)
-        return prev
+        return prev, entry
 
     def commit(
             self,
@@ -278,7 +277,7 @@ class HDHT(object):
             size,
             type_,
             **kwargs):
-        prev = self.write_data_entry(
+        prev, entry = self.write_data_entry(
                 table_entry,
                 c_key,
                 id_,
@@ -287,3 +286,4 @@ class HDHT(object):
                 type_,
                 **kwargs)
         self.write_table_entry(table_entry, c_key, prev)
+        return entry

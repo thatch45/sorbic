@@ -4,6 +4,7 @@ import sorbic.db
 
 # Import python libs
 import os
+import shutil
 import unittest
 import tempfile
 
@@ -19,6 +20,7 @@ class TestDB(unittest.TestCase):
         db.insert('foo', data)
         pull_data = db.get('foo')
         self.assertEqual(data, pull_data)
+        shutil.rmtree(w_dir)
 
     def test_higherarchy(self):
         w_dir = tempfile.mkdtemp()
@@ -34,6 +36,7 @@ class TestDB(unittest.TestCase):
         self.assertEqual(
                 table_entry['tfn'],
                 os.path.join(root, 'foo', 'bar', 'sorbic_table_0'))
+        shutil.rmtree(w_dir)
 
     def test_top_loc(self):
         w_dir = tempfile.mkdtemp()
@@ -49,3 +52,13 @@ class TestDB(unittest.TestCase):
         self.assertEqual(
                 table_entry['tfn'],
                 os.path.join(root, 'sorbic_table_0'))
+        shutil.rmtree(w_dir)
+
+    def test_id(self):
+        w_dir = tempfile.mkdtemp()
+        root = os.path.join(w_dir, 'db_root')
+        db = sorbic.db.DB(root)
+        data = {1:2}
+        key = 'somekey'
+        entry = db.insert(key, data)
+        db.get(key, entry['id'])

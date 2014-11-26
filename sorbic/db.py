@@ -81,7 +81,7 @@ class DB(object):
                 table_entry,
                 data,
                 serial)
-        self.index.commit(
+        return self.index.commit(
                 table_entry,
                 key,
                 c_key,
