@@ -77,3 +77,4 @@ class TestDB(unittest.TestCase):
             entries.append({'entry': entry, 'data': data})
         for entry in entries:
             self.assertEqual(db.get(key, entry['entry']['id']), entry['data'])
+        shutil.rmtree(w_dir)
