@@ -98,10 +98,10 @@ class HDHT(object):
             raw_head += raw_read
             if HEADER_DELIM in raw_head:
                 header.update(
-                        msgpack.loads(
-                            raw_head[:raw_head.find(HEADER_DELIM)]
-                            )
+                    msgpack.loads(
+                        raw_head[:raw_head.find(HEADER_DELIM)]
                         )
+                    )
                 self.tables[fn_] = header
                 return header
 
@@ -131,15 +131,15 @@ class HDHT(object):
         if not os.path.exists(dirname):
             os.makedirs(dirname)
         header = {
-                'hash': self.key_hash,
-                'hash_limit': self.hash_limit,
-                'header_len': self.header_len,
-                'fmt': self.fmt,
-                'bucket_size': self.bucket_size,
-                'fmt_map': self.fmt_map,
-                'dir': os.path.dirname(fn_),
-                'num': int(fn_[fn_.rindex('_') + 1:]),
-                }
+            'hash': self.key_hash,
+            'hash_limit': self.hash_limit,
+            'header_len': self.header_len,
+            'fmt': self.fmt,
+            'bucket_size': self.bucket_size,
+            'fmt_map': self.fmt_map,
+            'dir': os.path.dirname(fn_),
+            'num': int(fn_[fn_.rindex('_') + 1:]),
+            }
         header_entry = '{0}{1}'.format(msgpack.dumps(header), HEADER_DELIM)
         fp_ = io.open(fn_, 'w+b')
         fp_.write(header_entry)
@@ -154,13 +154,13 @@ class HDHT(object):
         Return the index data entry string
         '''
         entry = {
-                'ckey': c_key,
-                'st': start,
-                'sz': size,
-                'rev': sorbic.utils.gen_rev(),
-                't': type_,
-                'p': prev,
-                }
+            'ckey': c_key,
+            'st': start,
+            'sz': size,
+            'rev': sorbic.utils.gen_rev(),
+            't': type_,
+            'p': prev,
+            }
         entry.update(kwargs)
         if not id_:
             entry['id'] = sorbic.utils.rand_hex_str(self.key_size)
@@ -172,7 +172,7 @@ class HDHT(object):
 
     def _table_map(self, comps, fmt_map):
         '''
-        Convert a table map to a dict given the table's 
+        Convert a table map to a dict
         '''
         ret = {}
         for ind in range(len(fmt_map)):
@@ -189,10 +189,10 @@ class HDHT(object):
             table_fn = os.path.join(root, 'sorbic_table_{0}'.format(num))
             table = self.get_hash_table(table_fn)
             pos = _calc_pos(
-                    c_key,
-                    table['hash_limit'],
-                    table['bucket_size'],
-                    table['header_len'])
+                c_key,
+                table['hash_limit'],
+                table['bucket_size'],
+                table['header_len'])
             table['fp'].seek(pos)
             bucket = table['fp'].read(table['bucket_size'])
             try:
@@ -261,13 +261,13 @@ class HDHT(object):
         '''
         table = self.get_hash_table(table_entry['tfn'])
         raw, entry = self.data_entry(
-                c_key,
-                id_,
-                start,
-                size,
-                type_,
-                table_entry['prev'],
-                **kwargs)
+            c_key,
+            id_,
+            start,
+            size,
+            type_,
+            table_entry['prev'],
+            **kwargs)
         table['fp'].seek(0, 2)
         prev = table['fp'].tell()
         table['fp'].write(raw)
@@ -284,12 +284,12 @@ class HDHT(object):
             type_,
             **kwargs):
         prev, entry = self.write_data_entry(
-                table_entry,
-                c_key,
-                id_,
-                start,
-                size,
-                type_,
-                **kwargs)
+            table_entry,
+            c_key,
+            id_,
+            start,
+            size,
+            type_,
+            **kwargs)
         self.write_table_entry(table_entry, c_key, prev)
         return entry
