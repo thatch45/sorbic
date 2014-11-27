@@ -29,7 +29,7 @@ class DB(object):
             root,
             key_delim='/',
             hash_limit=0xfffff,
-            key_hash='blake',
+            key_hash='sha1',
             fmt='>KsQ',
             fmt_map=None,
             header_len=1024,

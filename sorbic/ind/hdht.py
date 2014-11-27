@@ -13,7 +13,6 @@ import sorbic.utils
 
 # Import Third Party Libs
 import msgpack
-import libnacl.blake
 
 HEADER_DELIM = '_||_||_'
 
@@ -58,8 +57,9 @@ class HDHT(object):
         Return the function to use to crypt hash index keys
         '''
         if self.key_hash.startswith('blake'):
+            import libnacl.blake
             return libnacl.blake.blake2b
-        return getattr(hashlib, self.hash_key)
+        return getattr(hashlib, self.key_hash)
 
     def __gen_key_size(self):
         '''
