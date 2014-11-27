@@ -143,7 +143,7 @@ class HDHT(object):
         header_entry = '{0}{1}'.format(msgpack.dumps(header), HEADER_DELIM)
         fp_ = io.open(fn_, 'w+b')
         fp_.write(header_entry)
-        fp_.seek((self.hash_limit * self.bucket_size) + self.header_len)
+        fp_.seek(((self.hash_limit + 2) * self.bucket_size) + self.header_len)
         fp_.write('\0')
         header['fp'] = fp_
         self.tables[fn_] = header
