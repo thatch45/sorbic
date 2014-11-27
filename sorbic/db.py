@@ -45,13 +45,13 @@ class DB(object):
         self._get_db_meta()
         self.storage = sorbic.stor.Stor(self.root, serial)
         self.index = sorbic.ind.hdht.HDHT(
-                self.root,
-                self.key_delim,
-                self.hash_limit,
-                self.key_hash,
-                self.fmt,
-                self.fmt_map,
-                self.header_len)
+            self.root,
+            self.key_delim,
+            self.hash_limit,
+            self.key_hash,
+            self.fmt,
+            self.fmt_map,
+            self.header_len)
 
     def _get_db_meta(self):
         '''
@@ -78,18 +78,18 @@ class DB(object):
         c_key = self.index.raw_crypt_key(key)
         table_entry = self.index.get_table_entry(key, c_key)
         start, size = self.storage.write(
-                table_entry,
-                data,
-                serial)
+            table_entry,
+            data,
+            serial)
         return self.index.commit(
-                table_entry,
-                key,
-                c_key,
-                id_,
-                start,
-                size,
-                type_,
-                **kwargs)
+            table_entry,
+            key,
+            c_key,
+            id_,
+            start,
+            size,
+            type_,
+            **kwargs)
 
     def get(self, key, id_=None):
         '''
@@ -97,7 +97,7 @@ class DB(object):
         '''
         entries = self.index.get_data_entry(key, id_)
         return self.storage.read(
-                entries['table'],
-                entries['data']['st'],
-                entries['data']['sz'],
-                self.serial)
+            entries['table'],
+            entries['data']['st'],
+            entries['data']['sz'],
+            self.serial)

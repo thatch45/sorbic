@@ -7,7 +7,6 @@ Utils
 import os
 import time
 import struct
-import hashlib
 import binascii
 import datetime
 
