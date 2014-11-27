@@ -71,7 +71,13 @@ class HDHT(object):
         '''
         Calculate the size of the index buckets
         '''
-        return len(struct.pack(self.fmt, '0' * self.key_size, 1))
+        args = []
+        for arg in self.fmt_map:
+            if arg == 'key':
+                args.append('0' * self.key_size)
+            elif arg == 'prev':
+                args.append(1)
+        return len(struct.pack(self.fmt, *args))
 
     def _open_hash_table(self, fn_):
         '''
