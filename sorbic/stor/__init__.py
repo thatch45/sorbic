@@ -35,8 +35,8 @@ class Stor(object):
         Get the storage file, open it if needed and add to the stores
         '''
         sfn = os.path.join(
-                os.path.dirname(table_entry['tfn']),
-                'sorbic_stor_{0}'.format(table_entry['num']))
+            os.path.dirname(table_entry['tfn']),
+            'sorbic_stor_{0}'.format(table_entry['num']))
         if sfn in self.stores:
             return self.stores[sfn]
         try:
