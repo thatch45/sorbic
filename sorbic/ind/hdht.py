@@ -247,6 +247,7 @@ class HDHT(object):
         t_str = struct.pack(table['fmt'], c_key, prev, table_entry['rev'] + 1)
         table['fp'].seek(table_entry['pos'])
         table['fp'].write(t_str)
+        return table_entry['rev'] + 1
 
     def write_data_entry(
             self,
@@ -292,5 +293,5 @@ class HDHT(object):
             size,
             type_,
             **kwargs)
-        self.write_table_entry(table_entry, c_key, prev)
+        entry['rev'] = self.write_table_entry(table_entry, c_key, prev)
         return entry
