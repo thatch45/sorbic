@@ -232,12 +232,12 @@ class HDHT(object):
             ret['data'] = data_entry
             if id_:
                 if data_entry['id'] == id_:
+                    ret['table']['rev'] = rev
                     return ret
                 if data_entry['p']:
                     prev = data_entry['p']
                     rev -= 1
                     continue
-                ret['table']['rev'] = rev
                 return ret
             else:
                 return ret

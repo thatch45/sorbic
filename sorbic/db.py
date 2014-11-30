@@ -110,3 +110,4 @@ class DB(object):
                 entries['data']['sz'],
                 self.serial)
             ret['meta'] = entries
+            return ret

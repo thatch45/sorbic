@@ -42,8 +42,9 @@ class TestScale(unittest.TestCase):
             e_data = db.insert(key, {1: num})
             ids.append(e_data)
         for num in xrange(entries):
-            pull_data = db.get(key, ids[num]['id'])
-            self.assertEqual({1: num}, pull_data)
+            pull_data = db.get(key, ids[num]['id'], True)
+            self.assertEqual({1: num}, pull_data['data'])
+            self.assertEqual(ids[num]['rev'], pull_data['meta']['table']['rev'])
         shutil.rmtree(w_dir)
 
     def test_many_keys_top(self):
