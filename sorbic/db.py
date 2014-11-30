@@ -91,11 +91,17 @@ class DB(object):
             type_,
             **kwargs)
 
+    def get_meta(self, key, id_=None):
+        '''
+        Retrive a meta entry
+        '''
+        return self.index.get_data_entry(key, id_)
+
     def get(self, key, id_=None, meta=False):
         '''
-        Retrive an entry
+        Retrive a data entry
         '''
-        entries = self.index.get_data_entry(key, id_)
+        entries = self.get_meta(key, id_)
         if not meta:
             return self.storage.read(
                 entries['table'],
