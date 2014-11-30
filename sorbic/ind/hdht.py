@@ -212,7 +212,7 @@ class HDHT(object):
                 return ret
             num += 1
 
-    def get_data_entry(self, key, id_=None):
+    def get_data_entry(self, key, id_=None, count=None):
         '''
         Get the data entry for the given key
         '''
@@ -225,6 +225,8 @@ class HDHT(object):
         prev = table_entry['prev']
         ret['table'] = table_entry
         rev = table_entry['rev']
+        counted = 0
+        rets = []
         while True:
             table['fp'].seek(prev)
             data_len = struct.unpack('>H', table['fp'].read(2))
@@ -239,6 +241,11 @@ class HDHT(object):
                     rev -= 1
                     continue
                 return ret
+            elif count:
+                if counted < count:
+                    rets.append(ret)
+                else:
+                    return rets
             else:
                 return ret
 

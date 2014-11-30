@@ -91,17 +91,33 @@ class DB(object):
             type_,
             **kwargs)
 
-    def get_meta(self, key, id_=None):
+    def _get_storage(self, entries):
+        return self.storage.read(
+                entries['table'],
+                entries['data']['st'],
+                entries['data']['sz'],
+                self.serial)
+
+    def get_meta(self, key, id_=None, count=None):
         '''
         Retrive a meta entry
         '''
-        return self.index.get_data_entry(key, id_)
+        return self.index.get_data_entry(key, id_, count)
 
-    def get(self, key, id_=None, meta=False):
+    def get(self, key, id_=None, meta=False, count=None):
         '''
         Retrive a data entry
         '''
-        entries = self.get_meta(key, id_)
+        entries = self.get_meta(key, id_, count)
+        if count:
+            ret = []
+            for entry in entries:
+                stor_ret = self._get_storage(entry)
+                if meta:
+                    ret.append({'data': stor_ret, 'meta': entry})
+                else:
+                    ret.append(self._get_storage(entry))
+            return ret
         if not meta:
             return self.storage.read(
                 entries['table'],
