@@ -6,13 +6,14 @@ Utils
 # Import python libs
 import os
 import time
+import random
 import struct
 import binascii
 import datetime
 
 # create a standard epoch so all platforms will count revs from
 # a standard epoch of jan 1 2014
-STD_EPOCH = time.mktime(datetime.datetime(2014, 1, 1).timetuple())
+STD_EPOCH = time.mktime(datetime.datetime(2014, 1, 1).timetuple()) * 1000000
 
 
 def rand_hex_str(size):
@@ -29,9 +30,9 @@ def rand_raw_str(size):
     return os.urandom(size)
 
 
-def gen_rev():
+def gen_id():
     '''
     Return a revision based on timestamp
     '''
-    r_time = time.time() - STD_EPOCH
-    return struct.pack('>Q', r_time * 1000000)
+    r_time = time.time() * 1000000 - STD_EPOCH
+    return struct.pack('>HQ', random.randint(0, 65535), r_time).encode('hex')

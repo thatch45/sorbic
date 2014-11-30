@@ -34,11 +34,11 @@ class HDHT(object):
             key_delim='/',
             hash_limit=0xfffff,
             key_hash='sha1',
-            fmt='>KsQ',
+            fmt='>KsQH',
             fmt_map=None,
             header_len=1024):
         if fmt_map is None:
-            self.fmt_map = ('key', 'prev')
+            self.fmt_map = ('key', 'prev', 'rev')
         else:
             self.fmt_map = fmt_map
         self.root = root
@@ -76,6 +76,8 @@ class HDHT(object):
             if arg == 'key':
                 args.append('0' * self.key_size)
             elif arg == 'prev':
+                args.append(1)
+            elif arg == 'rev':
                 args.append(1)
         return len(struct.pack(self.fmt, *args))
 
@@ -157,13 +159,12 @@ class HDHT(object):
             'ckey': c_key,
             'st': start,
             'sz': size,
-            'rev': sorbic.utils.gen_rev(),
             't': type_,
             'p': prev,
             }
         entry.update(kwargs)
         if not id_:
-            entry['id'] = sorbic.utils.rand_hex_str(self.key_size)
+            entry['id'] = sorbic.utils.gen_id()
         else:
             entry['id'] = id_
         packed = msgpack.dumps(entry)
@@ -198,9 +199,9 @@ class HDHT(object):
             try:
                 comps = struct.unpack(table['fmt'], bucket)
                 if comps[0] == '\0' * self.key_size:
-                    comps = (None, None)
+                    comps = (None, None, -1)
             except Exception:
-                comps = (None, None)
+                comps = (None, None, -1)
             ret = self._table_map(comps, table['fmt_map'])
             ret['pos'] = pos
             ret['tfn'] = table['fp'].name
@@ -243,7 +244,7 @@ class HDHT(object):
         Write a table entry
         '''
         table = self.get_hash_table(table_entry['tfn'])
-        t_str = struct.pack(table['fmt'], c_key, prev)
+        t_str = struct.pack(table['fmt'], c_key, prev, table_entry['rev'] + 1)
         table['fp'].seek(table_entry['pos'])
         table['fp'].write(t_str)
 

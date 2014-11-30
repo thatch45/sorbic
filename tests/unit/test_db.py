@@ -57,7 +57,7 @@ class TestDB(unittest.TestCase):
     def test_inv_fmt(self):
         w_dir = tempfile.mkdtemp()
         root = os.path.join(w_dir, 'db_root')
-        db = sorbic.db.DB(root, fmt='<KsQ', fmt_map=['key', 'prev'])
+        db = sorbic.db.DB(root, fmt='<KsQH', fmt_map=['key', 'prev', 'rev'])
         data = {1:2}
         db.insert('foo', data)
         pull_data = db.get('foo')
@@ -76,5 +76,6 @@ class TestDB(unittest.TestCase):
             entry = db.insert(key, data)
             entries.append({'entry': entry, 'data': data})
         for entry in entries:
+            print(entry['entry']['id'])
             self.assertEqual(db.get(key, entry['entry']['id']), entry['data'])
         shutil.rmtree(w_dir)
