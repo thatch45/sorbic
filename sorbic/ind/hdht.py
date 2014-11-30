@@ -224,6 +224,7 @@ class HDHT(object):
         table = self.tables[table_entry['tfn']]
         prev = table_entry['prev']
         ret['table'] = table_entry
+        rev = table_entry['rev']
         while True:
             table['fp'].seek(prev)
             data_len = struct.unpack('>H', table['fp'].read(2))
@@ -234,7 +235,9 @@ class HDHT(object):
                     return ret
                 if data_entry['p']:
                     prev = data_entry['p']
+                    rev -= 1
                     continue
+                ret['table']['rev'] = rev
                 return ret
             else:
                 return ret

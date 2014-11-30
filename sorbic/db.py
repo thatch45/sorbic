@@ -91,13 +91,22 @@ class DB(object):
             type_,
             **kwargs)
 
-    def get(self, key, id_=None):
+    def get(self, key, id_=None, meta=False):
         '''
         Retrive an entry
         '''
         entries = self.index.get_data_entry(key, id_)
-        return self.storage.read(
-            entries['table'],
-            entries['data']['st'],
-            entries['data']['sz'],
-            self.serial)
+        if not meta:
+            return self.storage.read(
+                entries['table'],
+                entries['data']['st'],
+                entries['data']['sz'],
+                self.serial)
+        else:
+            ret = {}
+            ret['data'] = self.storage.read(
+                entries['table'],
+                entries['data']['st'],
+                entries['data']['sz'],
+                self.serial)
+            ret['meta'] = entries

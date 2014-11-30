@@ -40,9 +40,9 @@ class TestScale(unittest.TestCase):
         ids = []
         for num in xrange(entries):
             e_data = db.insert(key, {1: num})
-            ids.append(e_data['id'])
+            ids.append(e_data)
         for num in xrange(entries):
-            pull_data = db.get(key, ids[num])
+            pull_data = db.get(key, ids[num]['id'])
             self.assertEqual({1: num}, pull_data)
         shutil.rmtree(w_dir)
 
