@@ -22,6 +22,16 @@ class TestDB(unittest.TestCase):
         self.assertEqual(data, pull_data)
         shutil.rmtree(w_dir)
 
+    def test_json(self):
+        w_dir = tempfile.mkdtemp()
+        root = os.path.join(w_dir, 'db_root')
+        db = sorbic.db.DB(root, serial='json')
+        data = {u'1':2}
+        db.insert('foo', data)
+        pull_data = db.get('foo')
+        self.assertEqual(data, pull_data)
+        shutil.rmtree(w_dir)
+
     def test_higherarchy(self):
         w_dir = tempfile.mkdtemp()
         root = os.path.join(w_dir, 'db_root')
