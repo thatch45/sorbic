@@ -111,12 +111,13 @@ class DB(object):
         entries = self.get_meta(key, id_, count)
         if count:
             ret = []
-            for entry in entries:
-                stor_ret = self._get_storage(entry)
+            for data_entry in entries['data']:
+                meta = {'table': entries['table'],'data': data_entry}
+                stor_ret = self._get_storage(meta)
                 if meta:
-                    ret.append({'data': stor_ret, 'meta': entry})
+                    ret.append({'data': stor_ret, 'meta': data_entry})
                 else:
-                    ret.append(self._get_storage(entry))
+                    ret.append(self._get_storage(meta))
             return ret
         if not meta:
             return self.storage.read(

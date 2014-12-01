@@ -226,7 +226,7 @@ class HDHT(object):
         ret['table'] = table_entry
         rev = table_entry['rev']
         counted = 0
-        rets = []
+        rets = {'data': [], 'table': table_entry}
         while True:
             table['fp'].seek(prev)
             data_len = struct.unpack('>H', table['fp'].read(2))
@@ -243,7 +243,11 @@ class HDHT(object):
                 return ret
             elif count:
                 if counted < count:
-                    rets.append(ret)
+                    rets['data'].append(data_entry)
+                    counted += 1
+                    prev = data_entry['p']
+                    if prev is None:
+                        return rets
                 else:
                     return rets
             else:
