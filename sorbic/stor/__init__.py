@@ -5,6 +5,7 @@ Storage managers
 # Import python libs
 import os
 import io
+import json
 # Import Third Party Libs
 import msgpack
 
@@ -29,6 +30,36 @@ class Stor(object):
         Read out data deserializing it from msgpack
         '''
         return msgpack.loads(raw_data)
+
+    def json_dump(self, data):
+        '''
+        Read in data serializing it into json
+        '''
+        return json.dumps(data)
+
+    def json_load(self, raw_data):
+        '''
+        Read out data deserializing it from json
+        '''
+        return json.loads(raw_data)
+
+    def pickle_load(self, raw_data):
+        '''
+        Handle the pickle storage backend
+        NOTICE - USING PICKLE IS NOT SECURE! REMOTE USERS CAN INJECT
+        COMMANDS, THIS WILL STAY DISABLED UNTIL IT CAN BE DISABLED BY DEFAULT
+        '''
+        raise NotImplementedError
+        # return pickle.loads(raw_data)
+
+    def pickle_dump(self, data):
+        '''
+        Handle the pickle storage backend
+        NOTICE - USING PICKLE IS NOT SECURE! REMOTE USERS CAN INJECT
+        COMMANDS, THIS WILL STAY DISABLED UNTIL IT CAN BE DISABLED BY DEFAULT
+        '''
+        raise NotImplementedError
+        # return pickle.dumps(data)
 
     def fn_from_table(self, table_entry):
         '''
