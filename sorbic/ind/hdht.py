@@ -151,12 +151,12 @@ class HDHT(object):
         self.tables[fn_] = header
         return header
 
-    def data_entry(self, c_key, id_, start, size, type_, prev, **kwargs):
+    def data_entry(self, key, id_, start, size, type_, prev, **kwargs):
         '''
         Return the index data entry string
         '''
         entry = {
-            'ckey': c_key,
+            'key': key,
             'st': start,
             'sz': size,
             't': type_,
@@ -266,7 +266,7 @@ class HDHT(object):
     def write_data_entry(
             self,
             table_entry,
-            c_key,
+            key,
             id_,
             start,
             size,
@@ -277,7 +277,7 @@ class HDHT(object):
         '''
         table = self.get_hash_table(table_entry['tfn'])
         raw, entry = self.data_entry(
-            c_key,
+            key,
             id_,
             start,
             size,
@@ -301,7 +301,7 @@ class HDHT(object):
             **kwargs):
         prev, entry = self.write_data_entry(
             table_entry,
-            c_key,
+            key,
             id_,
             start,
             size,
