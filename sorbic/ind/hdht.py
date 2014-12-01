@@ -123,6 +123,15 @@ class HDHT(object):
         root = key[:key.rfind(self.key_delim)].replace(self.key_delim, os.sep)
         return os.path.join(self.root, root)
 
+    def entry_base(self, key):
+        '''
+        Return the key basename
+        '''
+        if self.key_delim not in key:
+            return key
+        key = key.strip(self.key_delim)
+        return key[key.rfind(self.key_delim):].replace(self.key_delim, os.sep).lstrip(self.key_delim)
+
     def get_hash_table(self, fn_):
         '''
         Create a new hash table at the given location
@@ -156,7 +165,7 @@ class HDHT(object):
         Return the index data entry string
         '''
         entry = {
-            'key': key,
+            'r_key': self.entry_base(key),
             'st': start,
             'sz': size,
             't': type_,

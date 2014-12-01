@@ -48,6 +48,19 @@ class TestDB(unittest.TestCase):
                 os.path.join(root, 'foo', 'bar', 'sorbic_table_0'))
         shutil.rmtree(w_dir)
 
+    def test_r_key(self):
+        w_dir = tempfile.mkdtemp()
+        root = os.path.join(w_dir, 'db_root')
+        db = sorbic.db.DB(root)
+        data = {1:2}
+        full_key = 'foo/bar/baz/key'
+        r_key = 'key'
+        db.insert(full_key, data)
+        pull_data = db.get(full_key, meta=True)
+        self.assertEqual(data, pull_data['data'])
+        self.assertEqual(r_key, pull_data['meta']['data']['r_key'])
+        shutil.rmtree(w_dir)
+
     def test_top_loc(self):
         w_dir = tempfile.mkdtemp()
         root = os.path.join(w_dir, 'db_root')
