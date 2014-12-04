@@ -262,6 +262,17 @@ class HDHT(object):
             else:
                 return ret
 
+    def list_dir(self, d_key, meta=False):
+        '''
+        Return a list of the keys 
+        '''
+        fn_root = self.root
+        if not d_key or d_key == self.key_delim:
+            pass
+        else:
+            fn_root = self.entry_root('{0}/blank'.format(d_key))
+
+
     def write_table_entry(self, table_entry, c_key, prev):
         '''
         Write a table entry
