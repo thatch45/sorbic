@@ -15,6 +15,7 @@ import sorbic.utils
 import msgpack
 
 HEADER_DELIM = '_||_||_'
+IND_HEAD_FMT = '>Hc'
 
 
 def _calc_pos(c_key, hash_limit, b_size, header_len):
@@ -177,7 +178,7 @@ class HDHT(object):
         else:
             entry['id'] = id_
         packed = msgpack.dumps(entry)
-        p_len = struct.pack('>Hc', len(packed), 'k')
+        p_len = struct.pack(IND_HEAD_FMT, len(packed), 'k')
         return '{0}{1}'.format(p_len, packed), entry
 
     def _table_map(self, comps, fmt_map):
@@ -224,7 +225,7 @@ class HDHT(object):
     def _read_data_entry(self, table, prev):
         table['fp'].seek(prev)
         table['fp'].seek(prev)
-        data_head = struct.unpack('>Hc', table['fp'].read(3))
+        data_head = struct.unpack(IND_HEAD_FMT, table['fp'].read(3))
         return msgpack.loads(table['fp'].read(data_head[0]))
 
     def get_data_entry(self, key, id_=None, count=None):
@@ -291,6 +292,37 @@ class HDHT(object):
             data = self._read_data_entry(table, ret['prev'])
             ret['key'] = data['r_key']
             yield ret
+
+    def rm_key(self, key, id_=None):
+        '''
+        Remove a key id_, if no id_ is specified the key is recursively removed
+        '''
+        ret = False
+        c_key = self.raw_crypt_key(key)
+        table_entry = self.get_table_entry(key, c_key)
+        table = self.tables[table_entry['tfn']]
+        prev = table_entry['prev']
+        while True:
+            stub = True
+            table['fp'].seek(prev)
+            data_head = struct.unpack(IND_HEAD_FMT, table['fp'].read(3))
+            data_entry = msgpack.loads(table['fp'].read(data_head[0]))
+            if id_:
+                if data_entry['id'] != id_:
+                    stub = False
+            else:
+                stub = True
+            if stub:
+                table['fp'].seek(prev)
+                table['fp'].write(struct.pack(IND_HEAD_FMT, data_head[0], 'r'))
+                ret = True
+            prev = data_entry['prev']
+        if not id_:
+            # Stub out the table entry as well
+            table['fp'].seek(table_entry['pos'])
+            table['fp'].write('\0' * table['bucket_size'])
+            ret = True
+        return ret
 
     def listdir(self, d_key):
         '''
