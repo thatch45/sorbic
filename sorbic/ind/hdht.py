@@ -317,7 +317,11 @@ class HDHT(object):
                 table['fp'].seek(prev)
                 table['fp'].write(struct.pack(IND_HEAD_FMT, data_head[0], 'r'))
                 ret = True
-            prev = data_entry['prev']
+                if id_:
+                    break
+            prev = data_entry['p']
+            if not prev:
+                break
         if not id_:
             # Stub out the table entry as well
             table['fp'].seek(table_entry['pos'])

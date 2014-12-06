@@ -162,3 +162,18 @@ class TestDB(unittest.TestCase):
         self.assertIsNone(pull_data2)
         self.assertEqual(data, pull_data3)
         shutil.rmtree(w_dir)
+
+    def test_rm(self):
+        '''
+        Verify that the key is removed by the rm routine
+        '''
+        w_dir = tempfile.mkdtemp()
+        root = os.path.join(w_dir, 'db_root')
+        db_ = sorbic.db.DB(root)
+        data = {1:2}
+        key = 'foo/bar/baz'
+        db_.insert(key, data)
+        db_.rm('foo/bar/baz')
+        pull_data = db_.get(key)
+        self.assertIsNone(pull_data)
+        shutil.rmtree(w_dir)
