@@ -5,6 +5,7 @@ Higherarchical Distributed Hash Table index
 # Import python libs
 import os
 import io
+import shutil
 import struct
 import hashlib
 
@@ -323,6 +324,19 @@ class HDHT(object):
             table['fp'].write('\0' * table['bucket_size'])
             ret = True
         return ret
+
+    def rmdir(self, d_key):
+        '''
+        Recursively remove a key directory and all keys and key data
+        therein and below.
+        '''
+        fn_root = self.root
+        if not d_key or d_key == self.key_delim:
+            pass
+        else:
+            fn_root = self.entry_root('{0}/blank'.format(d_key))
+        shutil.rmtree(fn_root)
+        return True
 
     def listdir(self, d_key):
         '''
