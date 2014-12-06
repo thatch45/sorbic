@@ -109,6 +109,8 @@ class DB(object):
         Retrive a data entry
         '''
         entries = self.get_meta(key, id_, count)
+        if not entries:
+            return None
         if count:
             ret = []
             for data_entry in entries['data']:

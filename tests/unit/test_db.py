@@ -139,3 +139,26 @@ class TestDB(unittest.TestCase):
         for entry in entries:
             self.assertEqual(db_.get(key, entry['entry']['id']), entry['data'])
         shutil.rmtree(w_dir)
+
+    def test_rmdir(self):
+        '''
+        Verify that the directory is removed and tht other data is untouched
+        '''
+        w_dir = tempfile.mkdtemp()
+        root = os.path.join(w_dir, 'db_root')
+        db_ = sorbic.db.DB(root)
+        data = {1:2}
+        key = 'foo/bar/baz'
+        key2 = 'foo/bar/baz_2'
+        key3 = 'foo/quo/qux'
+        db_.insert(key, data)
+        db_.insert(key2, data)
+        db_.insert(key3, data)
+        db_.rmdir('foo/bar')
+        pull_data = db_.get(key)
+        pull_data2 = db_.get(key2)
+        pull_data3 = db_.get(key3)
+        self.assertIsNone(pull_data)
+        self.assertIsNone(pull_data2)
+        self.assertEqual(data, pull_data3)
+        shutil.rmtree(w_dir)
