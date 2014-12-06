@@ -134,3 +134,9 @@ class DB(object):
                 self.serial)
             ret['meta'] = entries
             return ret
+
+    def listdir(self, d_key):
+        '''
+        List the contents of a directory
+        '''
+        return self.index.listdir(d_key)

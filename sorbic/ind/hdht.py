@@ -288,7 +288,7 @@ class HDHT(object):
 
             yield ret
 
-    def list_dir(self, d_key, meta=False):
+    def listdir(self, d_key):
         '''
         Return a list of the keys 
         '''
