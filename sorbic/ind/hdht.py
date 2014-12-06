@@ -177,7 +177,7 @@ class HDHT(object):
         else:
             entry['id'] = id_
         packed = msgpack.dumps(entry)
-        p_len = struct.pack('>H', len(packed))
+        p_len = struct.pack('>Hc', len(packed), 'k')
         return '{0}{1}'.format(p_len, packed), entry
 
     def _table_map(self, comps, fmt_map):
@@ -224,8 +224,8 @@ class HDHT(object):
     def _read_data_entry(self, table, prev):
         table['fp'].seek(prev)
         table['fp'].seek(prev)
-        data_len = struct.unpack('>H', table['fp'].read(2))
-        return msgpack.loads(table['fp'].read(data_len[0]))
+        data_head = struct.unpack('>Hc', table['fp'].read(3))
+        return msgpack.loads(table['fp'].read(data_head[0]))
 
     def get_data_entry(self, key, id_=None, count=None):
         '''
