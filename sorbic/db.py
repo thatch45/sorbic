@@ -140,3 +140,17 @@ class DB(object):
         List the contents of a directory
         '''
         return self.index.listdir(d_key)
+
+    def rmdir(self, d_key):
+        '''
+        Recursively remove a key directory and all subdirs and subkeys.
+        THIS OPERATION IS IRREVERSIBLE!!
+        '''
+        return self.index.rmdir(d_key)
+
+    def rm(self, key, id_=None):
+        '''
+        Make a key for deletion, if the id is omitted then the key itself
+        and all revs will be removed. THIS OPERATION IS IRREVERSIBLE!!
+        '''
+        return self.index.rm_key(key, id_)
