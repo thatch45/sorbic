@@ -221,6 +221,12 @@ class HDHT(object):
                 return ret
             num += 1
 
+    def _read_data_entry(self, table, prev):
+        table['fp'].seek(prev)
+        table['fp'].seek(prev)
+        data_len = struct.unpack('>H', table['fp'].read(2))
+        return msgpack.loads(table['fp'].read(data_len[0]))
+
     def get_data_entry(self, key, id_=None, count=None):
         '''
         Get the data entry for the given key
@@ -237,9 +243,7 @@ class HDHT(object):
         counted = 0
         rets = {'data': [], 'table': table_entry}
         while True:
-            table['fp'].seek(prev)
-            data_len = struct.unpack('>H', table['fp'].read(2))
-            data_entry = msgpack.loads(table['fp'].read(data_len[0]))
+            data_entry = self._read_data_entry(table, prev)
             ret['data'] = data_entry
             if id_:
                 if data_entry['id'] == id_:
@@ -262,16 +266,45 @@ class HDHT(object):
             else:
                 return ret
 
+    def _get_table_entries(self, fn_):
+        '''
+        Return the table entries in a given table
+        '''
+        table = self.get_hash_table(fn_)
+        table['fp'].seek(table['header_len'])
+        while True:
+            bucket = table['fp'].read(table['bucket_size'])
+            try:
+                comps = struct.unpack(table['fmt'], bucket)
+                if comps[0] == '\0' * self.key_size:
+                    comps = (None, None, -1)
+            except Exception:
+                comps = (None, None, -1)
+            if not comps[0]:
+                continue
+            ret = self._table_map(comps, table['fmt_map'])
+            data = self._read_data_entry(table, ret['prev'])
+            ret['key'] = data['key']
+
+            yield ret
+
     def list_dir(self, d_key, meta=False):
         '''
         Return a list of the keys 
         '''
         fn_root = self.root
+        ret = []
         if not d_key or d_key == self.key_delim:
             pass
         else:
             fn_root = self.entry_root('{0}/blank'.format(d_key))
-
+        for fn_ in os.listdir(fn_root):
+            if not fn_.startswith('sorbic_table_'):
+                continue
+            full = os.path.join(fn_root, fn_)
+            for entry in self._get_table_entries(full):
+                ret.append(entry)
+        return ret
 
     def write_table_entry(self, table_entry, c_key, prev):
         '''
