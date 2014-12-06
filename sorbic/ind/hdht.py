@@ -272,8 +272,13 @@ class HDHT(object):
         '''
         table = self.get_hash_table(fn_)
         table['fp'].seek(table['header_len'])
+        seek_lim = ((self.hash_limit + 2) * self.bucket_size) + self.header_len
         while True:
             bucket = table['fp'].read(table['bucket_size'])
+            if table['fp'].tell() > seek_lim:
+                break
+            if bucket.startswith('\0'):
+                continue
             try:
                 comps = struct.unpack(table['fmt'], bucket)
                 if comps[0] == '\0' * self.key_size:
@@ -284,8 +289,7 @@ class HDHT(object):
                 continue
             ret = self._table_map(comps, table['fmt_map'])
             data = self._read_data_entry(table, ret['prev'])
-            ret['key'] = data['key']
-
+            ret['key'] = data['r_key']
             yield ret
 
     def listdir(self, d_key):
