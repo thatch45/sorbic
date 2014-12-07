@@ -71,6 +71,13 @@ class DB(object):
         with io.open(db_meta, 'w+b') as fp_:
             fp_.write(msgpack.dumps(meta))
 
+    def _get_storage(self, entries):
+        return self.storage.read(
+                entries['table'],
+                entries['data']['st'],
+                entries['data']['sz'],
+                self.serial)
+
     def insert(self, key, data, id_=None, type_='doc', serial=None, **kwargs):
         '''
         Insert a key into the database
@@ -90,13 +97,6 @@ class DB(object):
             size,
             type_,
             **kwargs)
-
-    def _get_storage(self, entries):
-        return self.storage.read(
-                entries['table'],
-                entries['data']['st'],
-                entries['data']['sz'],
-                self.serial)
 
     def get_meta(self, key, id_=None, count=None):
         '''
