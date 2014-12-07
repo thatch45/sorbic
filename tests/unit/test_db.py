@@ -177,3 +177,19 @@ class TestDB(unittest.TestCase):
         pull_data = db_.get(key)
         self.assertIsNone(pull_data)
         shutil.rmtree(w_dir)
+
+    def test_rm_collide(self):
+        # 13875 and 99991 are known to colide
+        w_dir = tempfile.mkdtemp()
+        root = os.path.join(w_dir, 'db_root')
+        db_ = sorbic.db.DB(root)
+        data1 = {1:1}
+        data2 = {1:2}
+        key1 = '13875'
+        key2 = '99991'
+        db_.insert(key1, data1)
+        db_.insert(key2, data2)
+        db_.rm(key1)
+        pull_data = db_.get(key2)
+        self.assertEqual(pull_data, data2)
+        shutil.rmtree(w_dir)

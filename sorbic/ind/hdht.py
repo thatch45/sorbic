@@ -221,6 +221,12 @@ class HDHT(object):
                 return ret
             if ret['key'] == c_key:
                 return ret
+            # Adding these lines in will show keys that collide
+            # in the hash table in the tests
+            #print('***************')
+            #print(self._read_data_entry(table, ret['prev']))
+            #print(key)
+            #print('***************')
             num += 1
 
     def _read_data_entry(self, table, prev):
@@ -240,6 +246,9 @@ class HDHT(object):
             return None
         table = self.tables[table_entry['tfn']]
         prev = table_entry['prev']
+        if prev == 0:
+            # There is no data, stubbed out for deletion, return None
+            return None
         ret['table'] = table_entry
         rev = table_entry['rev']
         counted = 0
@@ -325,7 +334,7 @@ class HDHT(object):
         if not id_:
             # Chck if the next table has a collision entry, if so keey this
             # table entry and mark it for removal in a compact call
-            next_fn = '{0}{1}'.format(table['fp'].name[-1], table['num'] + 1)
+            next_fn = '{0}{1}'.format(table['fp'].name[:-1], table['num'] + 1)
             collision = False
             if os.path.isfile(next_fn):
                 next_table = self.get_hash_table(next_fn)
@@ -337,7 +346,7 @@ class HDHT(object):
             if not collision:
                 stub_entry = '\0' * table['bucket_size']
             else:
-                stub_entry = struct.pack(table['fmt'], table_entry['key'], None, 0)
+                stub_entry = struct.pack(table['fmt'], table_entry['key'], 0, 0)
             table['fp'].seek(table_entry['pos'])
             table['fp'].write(stub_entry)
             ret = True
