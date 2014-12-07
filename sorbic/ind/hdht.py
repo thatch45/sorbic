@@ -323,9 +323,23 @@ class HDHT(object):
             if not prev:
                 break
         if not id_:
+            # Chck if the next table has a collision entry, if so keey this
+            # table entry and mark it for removal in a compact call
+            next_fn = '{0}{1}'.format(table['fp'].name[-1], table['num'] + 1)
+            collision = False
+            if os.path.isfile(next_fn):
+                next_table = self.get_hash_table(next_fn)
+                next_table['fp'].seek(table_entry['pos'])
+                next_raw_entry = next_table['fp'].read(next_table['bucket_size'])
+                if next_raw_entry != '\0' * next_table['bucket_size']:
+                    collision = True
             # Stub out the table entry as well
+            if not collision:
+                stub_entry = '\0' * table['bucket_size']
+            else:
+                stub_entry = struct.pack(table['fmt'], table_entry['key'], None, 0)
             table['fp'].seek(table_entry['pos'])
-            table['fp'].write('\0' * table['bucket_size'])
+            table['fp'].write(stub_entry)
             ret = True
         return ret
 
