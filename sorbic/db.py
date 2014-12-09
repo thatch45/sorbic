@@ -102,7 +102,7 @@ class DB(object):
         '''
         Retrive a meta entry
         '''
-        return self.index.get_data_entry(key, id_, count)
+        return self.index.get_index_entry(key, id_, count)
 
     def get(self, key, id_=None, meta=False, count=None):
         '''
@@ -113,11 +113,11 @@ class DB(object):
             return None
         if count:
             ret = []
-            for data_entry in entries['data']:
-                meta = {'table': entries['table'],'data': data_entry}
+            for index_entry in entries['data']:
+                meta = {'table': entries['table'],'data': index_entry}
                 stor_ret = self._get_storage(meta)
                 if meta:
-                    ret.append({'data': stor_ret, 'meta': data_entry})
+                    ret.append({'data': stor_ret, 'meta': index_entry})
                 else:
                     ret.append(self._get_storage(meta))
             return ret

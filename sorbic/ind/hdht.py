@@ -162,7 +162,7 @@ class HDHT(object):
         self.tables[fn_] = header
         return header
 
-    def data_entry(self, key, id_, start, size, type_, prev, **kwargs):
+    def index_entry(self, key, id_, start, size, type_, prev, **kwargs):
         '''
         Return the index data entry string
         '''
@@ -224,18 +224,18 @@ class HDHT(object):
             # Adding these lines in will show keys that collide
             # in the hash table in the tests
             #print('***************')
-            #print(self._read_data_entry(table, ret['prev']))
+            #print(self._read_index_entry(table, ret['prev']))
             #print(key)
             #print('***************')
             num += 1
 
-    def _read_data_entry(self, table, prev):
+    def _read_index_entry(self, table, prev):
         table['fp'].seek(prev)
         table['fp'].seek(prev)
         data_head = struct.unpack(IND_HEAD_FMT, table['fp'].read(3))
         return msgpack.loads(table['fp'].read(data_head[0]))
 
-    def get_data_entry(self, key, id_=None, count=None):
+    def get_index_entry(self, key, id_=None, count=None):
         '''
         Get the data entry for the given key
         '''
@@ -254,22 +254,22 @@ class HDHT(object):
         counted = 0
         rets = {'data': [], 'table': table_entry}
         while True:
-            data_entry = self._read_data_entry(table, prev)
-            ret['data'] = data_entry
+            index_entry = self._read_index_entry(table, prev)
+            ret['data'] = index_entry
             if id_:
-                if data_entry['id'] == id_:
+                if index_entry['id'] == id_:
                     ret['table']['rev'] = rev
                     return ret
-                if data_entry['p']:
-                    prev = data_entry['p']
+                if index_entry['p']:
+                    prev = index_entry['p']
                     rev -= 1
                     continue
                 return ret
             elif count:
                 if counted < count:
-                    rets['data'].append(data_entry)
+                    rets['data'].append(index_entry)
                     counted += 1
-                    prev = data_entry['p']
+                    prev = index_entry['p']
                     if prev is None:
                         return rets
                 else:
@@ -299,7 +299,7 @@ class HDHT(object):
             if not comps[0]:
                 continue
             ret = self._table_map(comps, table['fmt_map'])
-            data = self._read_data_entry(table, ret['prev'])
+            data = self._read_index_entry(table, ret['prev'])
             ret['key'] = data['r_key']
             yield ret
 
@@ -316,9 +316,9 @@ class HDHT(object):
             stub = True
             table['fp'].seek(prev)
             data_head = struct.unpack(IND_HEAD_FMT, table['fp'].read(3))
-            data_entry = msgpack.loads(table['fp'].read(data_head[0]))
+            index_entry = msgpack.loads(table['fp'].read(data_head[0]))
             if id_:
-                if data_entry['id'] != id_:
+                if index_entry['id'] != id_:
                     stub = False
             else:
                 stub = True
@@ -328,7 +328,7 @@ class HDHT(object):
                 ret = True
                 if id_:
                     break
-            prev = data_entry['p']
+            prev = index_entry['p']
             if not prev:
                 break
         if not id_:
@@ -393,7 +393,7 @@ class HDHT(object):
         table['fp'].write(t_str)
         return table_entry['rev'] + 1
 
-    def write_data_entry(
+    def write_index_entry(
             self,
             table_entry,
             key,
@@ -406,7 +406,7 @@ class HDHT(object):
         Write a data entry
         '''
         table = self.get_hash_table(table_entry['tfn'])
-        raw, entry = self.data_entry(
+        raw, entry = self.index_entry(
             key,
             id_,
             start,
@@ -429,7 +429,7 @@ class HDHT(object):
             size,
             type_,
             **kwargs):
-        prev, entry = self.write_data_entry(
+        prev, entry = self.write_index_entry(
             table_entry,
             key,
             id_,
