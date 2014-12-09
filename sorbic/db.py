@@ -43,7 +43,6 @@ class DB(object):
         self.header_len = header_len
         self.serial = serial
         self._get_db_meta()
-        self.storage = sorbic.stor.Stor(self.root, serial)
         self.index = sorbic.ind.hdht.HDHT(
             self.root,
             self.key_delim,
@@ -72,7 +71,7 @@ class DB(object):
             fp_.write(msgpack.dumps(meta))
 
     def _get_storage(self, entries):
-        return self.storage.read(
+        return self.index.read_stor(
                 entries['table'],
                 entries['data']['st'],
                 entries['data']['sz'],
@@ -84,7 +83,8 @@ class DB(object):
         '''
         c_key = self.index.raw_crypt_key(key)
         table_entry = self.index.get_table_entry(key, c_key)
-        start, size = self.storage.write(
+        serial = serial if serial else self.serial
+        start, size = self.index.write_stor(
             table_entry,
             data,
             serial)
@@ -122,14 +122,14 @@ class DB(object):
                     ret.append(self._get_storage(meta))
             return ret
         if not meta:
-            return self.storage.read(
+            return self.index.read_stor(
                 entries['table'],
                 entries['data']['st'],
                 entries['data']['sz'],
                 self.serial)
         else:
             ret = {}
-            ret['data'] = self.storage.read(
+            ret['data'] = self.index.read_stor(
                 entries['table'],
                 entries['data']['st'],
                 entries['data']['sz'],

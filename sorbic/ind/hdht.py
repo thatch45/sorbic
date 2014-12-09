@@ -11,6 +11,7 @@ import hashlib
 
 # Import sorbic libs
 import sorbic.utils
+import sorbic.stor.serial
 
 # Import Third Party Libs
 import msgpack
@@ -38,7 +39,8 @@ class HDHT(object):
             key_hash='sha1',
             fmt='>KsQH',
             fmt_map=None,
-            header_len=1024):
+            header_len=1024,
+            serial='msgpack'):
         if fmt_map is None:
             self.fmt_map = ('key', 'prev', 'rev')
         else:
@@ -52,6 +54,7 @@ class HDHT(object):
         self.key_size = self.__gen_key_size()
         self.fmt = fmt.replace('K', str(self.key_size))
         self.bucket_size = self.__gen_bucket_size()
+        self.serial = sorbic.stor.serial.Serial(serial)
         self.tables = {}
 
     def __crypt_func(self):
@@ -439,3 +442,27 @@ class HDHT(object):
             **kwargs)
         entry['rev'] = self.write_table_entry(table_entry, c_key, prev)
         return entry
+
+    def write_stor(self, table_entry, data, serial=None):
+        '''
+        Write the data to the storage file
+        '''
+        table = self.get_hash_table(table_entry['tfn'])
+        serial = serial if serial else self.serial.default
+        serial_fun = getattr(self.serial, '{0}_dump'.format(serial))
+        serial_data = serial_fun(data)
+        table['fp'].seek(0, 2)
+        start = table['fp'].tell()
+        table['fp'].write(serial_data)
+        return start, len(serial_data)
+
+    def read_stor(self, table_entry, start, size, serial=None):
+        '''
+        Read in the data
+        '''
+        table = self.get_hash_table(table_entry['tfn'])
+        table['fp'].seek(start)
+        raw = table['fp'].read(size)
+        serial = serial if serial else self.serial.default
+        serial_fun = getattr(self.serial, '{0}_load'.format(serial))
+        return serial_fun(raw)
