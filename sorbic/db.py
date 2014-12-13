@@ -70,12 +70,16 @@ class DB(object):
         with io.open(db_meta, 'w+b') as fp_:
             fp_.write(msgpack.dumps(meta))
 
-    def _get_storage(self, entries):
-        return self.index.read_stor(
+    def _get_storage(self, entries, doc_path):
+        stor = self.index.read_stor(
                 entries['table'],
                 entries['data']['st'],
                 entries['data']['sz'],
                 self.serial)
+        if doc_path:
+            return sorbic.utils.doc_resolve(stor, doc_path)
+        else:
+            return stor
 
     def insert(self, key, data, id_=None, type_='doc', serial=None, **kwargs):
         '''
@@ -104,7 +108,7 @@ class DB(object):
         '''
         return self.index.get_index_entry(key, id_, count)
 
-    def get(self, key, id_=None, meta=False, count=None):
+    def get(self, key, id_=None, meta=False, count=None, doc_path=''):
         '''
         Retrive a data entry
         '''
@@ -114,26 +118,18 @@ class DB(object):
         if count:
             ret = []
             for index_entry in entries['data']:
-                meta = {'table': entries['table'],'data': index_entry}
-                stor_ret = self._get_storage(meta)
+                meta_entries = {'table': entries['table'],'data': index_entry}
+                stor_ret = self._get_storage(meta_entries, doc_path)
                 if meta:
                     ret.append({'data': stor_ret, 'meta': index_entry})
                 else:
-                    ret.append(self._get_storage(meta))
+                    ret.append(self._get_storage(meta_entries, doc_path))
             return ret
         if not meta:
-            return self.index.read_stor(
-                entries['table'],
-                entries['data']['st'],
-                entries['data']['sz'],
-                self.serial)
+            return self._get_storage(entries, doc_path)
         else:
             ret = {}
-            ret['data'] = self.index.read_stor(
-                entries['table'],
-                entries['data']['st'],
-                entries['data']['sz'],
-                self.serial)
+            ret['data'] = self._get_storage(entries, doc_path)
             ret['meta'] = entries
             return ret
 
