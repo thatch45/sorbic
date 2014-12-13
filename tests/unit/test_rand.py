@@ -40,3 +40,17 @@ class TestRand(unittest.TestCase):
                 if n_1 == n_2:
                     continue
                 self.assertNotEqual(rands[n_1], rands[n_2])
+
+    def test_id(self):
+        '''
+        Test database creation
+        '''
+        rands = []
+        for _ in range(0,1000):
+            r_1 = sorbic.utils.rand.gen_id()
+            rands.append(r_1)
+        for n_1 in range(0, 1000):
+            for n_2 in range(0, 1000):
+                if n_1 == n_2:
+                    continue
+                self.assertNotEqual(rands[n_1], rands[n_2])
