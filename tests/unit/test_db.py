@@ -193,3 +193,16 @@ class TestDB(unittest.TestCase):
         pull_data = db_.get(key2)
         self.assertEqual(pull_data, data2)
         shutil.rmtree(w_dir)
+
+    def test_doc_data(self):
+        '''
+        Test database creation
+        '''
+        w_dir = tempfile.mkdtemp()
+        root = os.path.join(w_dir, 'db_root')
+        db_ = sorbic.db.DB(root)
+        data = {'cheese': {'spam': {'bacon': 'end'}}}
+        db_.insert('foo', data)
+        pull_data = db_.get('foo', doc_path='cheese:spam:bacon')
+        self.assertEqual('end', pull_data)
+        shutil.rmtree(w_dir)
