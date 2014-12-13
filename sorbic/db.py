@@ -77,7 +77,7 @@ class DB(object):
                 entries['data']['sz'],
                 self.serial)
         if doc_path:
-            return sorbic.utils.doc_resolve(stor, doc_path)
+            return sorbic.utils.traverse_dict_and_list(stor, doc_path)
         else:
             return stor
 
