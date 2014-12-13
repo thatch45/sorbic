@@ -7,6 +7,7 @@ import io
 # Import sorbic libs
 import sorbic.ind.hdht
 import sorbic.stor
+import sorbic.utils.traverse
 # Import third party libs
 import msgpack
 
@@ -77,7 +78,7 @@ class DB(object):
                 entries['data']['sz'],
                 self.serial)
         if doc_path:
-            return sorbic.utils.traverse_dict_and_list(stor, doc_path)
+            return sorbic.utils.traverse.traverse_dict_and_list(stor, doc_path)
         else:
             return stor
 

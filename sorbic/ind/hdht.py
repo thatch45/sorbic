@@ -10,7 +10,7 @@ import struct
 import hashlib
 
 # Import sorbic libs
-import sorbic.utils
+import sorbic.utils.rand
 import sorbic.stor.serial
 
 # Import Third Party Libs
@@ -178,7 +178,7 @@ class HDHT(object):
             }
         entry.update(kwargs)
         if not id_:
-            entry['id'] = sorbic.utils.gen_id()
+            entry['id'] = sorbic.utils.rand.gen_id()
         else:
             entry['id'] = id_
         packed = msgpack.dumps(entry)
