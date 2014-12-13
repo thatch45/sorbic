@@ -13,7 +13,7 @@ class TestRand(unittest.TestCase):
     '''
     def test_rand_hex_strs(self):
         '''
-        Test database creation
+        Test rand hex strings
         '''
         rands = []
         for _ in range(0,100):
@@ -28,7 +28,7 @@ class TestRand(unittest.TestCase):
 
     def test_rand_raw_strs(self):
         '''
-        Test database creation
+        Test rand raw strings
         '''
         rands = []
         for _ in range(0,100):
@@ -43,7 +43,7 @@ class TestRand(unittest.TestCase):
 
     def test_id(self):
         '''
-        Test database creation
+        Test id creation
         '''
         rands = []
         for _ in range(0,1000):
@@ -51,6 +51,20 @@ class TestRand(unittest.TestCase):
             rands.append(r_1)
         for n_1 in range(0, 1000):
             for n_2 in range(0, 1000):
+                if n_1 == n_2:
+                    continue
+                self.assertNotEqual(rands[n_1], rands[n_2])
+
+    def _test_id_too_many(self):
+        '''
+        Test way too much id creation
+        '''
+        rands = []
+        for _ in range(0,10000000):
+            r_1 = sorbic.utils.rand.gen_id()
+            rands.append(r_1)
+        for n_1 in range(0, 10000000):
+            for n_2 in range(0, 10000000):
                 if n_1 == n_2:
                     continue
                 self.assertNotEqual(rands[n_1], rands[n_2])
