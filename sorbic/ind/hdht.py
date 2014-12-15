@@ -215,7 +215,7 @@ class HDHT(object):
                 comps = struct.unpack(table['fmt'], bucket)
                 if comps[0] == '\0' * self.key_size:
                     comps = (None, None, -1)
-            except Exception:
+            except struct.error:
                 comps = (None, None, -1)
             ret = self._table_map(comps, table['fmt_map'])
             ret['pos'] = pos
@@ -298,7 +298,7 @@ class HDHT(object):
                 comps = struct.unpack(table['fmt'], bucket)
                 if comps[0] == '\0' * self.key_size:
                     comps = (None, None, -1)
-            except Exception:
+            except struct.error:
                 comps = (None, None, -1)
             if not comps[0]:
                 continue
@@ -371,7 +371,7 @@ class HDHT(object):
 
     def listdir(self, d_key):
         '''
-        Return a list of the keys 
+        Return a list of the keys
         '''
         fn_root = self.root
         ret = []

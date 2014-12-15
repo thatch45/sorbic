@@ -136,7 +136,7 @@ class DB(object):
         if count:
             ret = []
             for index_entry in entries['data']:
-                meta_entries = {'table': entries['table'],'data': index_entry}
+                meta_entries = {'table': entries['table'], 'data': index_entry}
                 stor_ret = self._get_storage(meta_entries, **kwargs)
                 if meta:
                     ret.append({'data': stor_ret, 'meta': index_entry})

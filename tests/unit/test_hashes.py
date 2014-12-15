@@ -9,7 +9,7 @@ import unittest
 import tempfile
 
 try:
-    import libnacl.blake
+    import libnacl.blake  # pylint: disable=W0611
     HAS_BLAKE = True
 except ImportError:
     HAS_BLAKE = False

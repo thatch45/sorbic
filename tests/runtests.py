@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # Import python libs
+from __future__ import print_function
 import os
 import sys
 

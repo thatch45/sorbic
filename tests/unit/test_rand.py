@@ -16,7 +16,7 @@ class TestRand(unittest.TestCase):
         Test rand hex strings
         '''
         rands = []
-        for _ in range(0,100):
+        for _ in range(0, 100):
             r_1 = sorbic.utils.rand.rand_hex_str(24)
             self.assertEqual(24, len(r_1))
             rands.append(r_1)
@@ -31,7 +31,7 @@ class TestRand(unittest.TestCase):
         Test rand raw strings
         '''
         rands = []
-        for _ in range(0,100):
+        for _ in range(0, 100):
             r_1 = sorbic.utils.rand.rand_raw_str(24)
             self.assertEqual(24, len(r_1))
             rands.append(r_1)
@@ -46,7 +46,7 @@ class TestRand(unittest.TestCase):
         Test id creation
         '''
         rands = []
-        for _ in range(0,1000):
+        for _ in range(0, 1000):
             r_1 = sorbic.utils.rand.gen_id()
             rands.append(r_1)
         for n_1 in range(0, 1000):
@@ -60,7 +60,7 @@ class TestRand(unittest.TestCase):
         Test way too much id creation
         '''
         rands = []
-        for _ in range(0,10000000):
+        for _ in range(0, 10000000):
             r_1 = sorbic.utils.rand.gen_id()
             rands.append(r_1)
         for n_1 in range(0, 10000000):
