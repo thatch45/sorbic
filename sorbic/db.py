@@ -52,6 +52,14 @@ class DB(object):
             self.fmt,
             self.fmt_map,
             self.header_len)
+        self.write_stor_funcs = self.__gen_write_stor_funcs()
+
+    def __gen_write_stor_funcs(self):
+        '''
+        Return the storage write functions dict mapping to types
+        '''
+        return {'doc': self.index.write_doc_stor,
+                'file': None}
 
     def _get_db_meta(self):
         '''
@@ -82,6 +90,15 @@ class DB(object):
         else:
             return stor
 
+    def write_stor(self, table_entry, data, serial, type_):
+        '''
+        Write the applicable storage type subsytem
+        '''
+        return self.write_stor_funcs[type_](
+                 table_entry,
+                 data,
+                 serial)
+
     def insert(self, key, data, id_=None, type_='doc', serial=None, **kwargs):
         '''
         Insert a key into the database
@@ -89,17 +106,16 @@ class DB(object):
         c_key = self.index.raw_crypt_key(key)
         table_entry = self.index.get_table_entry(key, c_key)
         serial = serial if serial else self.serial
-        start, size = self.index.write_stor(
+        kwargs.update(self.write_stor(
             table_entry,
             data,
-            serial)
+            serial,
+            type_))
         return self.index.commit(
             table_entry,
             key,
             c_key,
             id_,
-            start,
-            size,
             type_,
             **kwargs)
 

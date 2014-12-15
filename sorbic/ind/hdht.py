@@ -165,14 +165,14 @@ class HDHT(object):
         self.tables[fn_] = header
         return header
 
-    def index_entry(self, key, id_, start, size, type_, prev, **kwargs):
+    def index_entry(self, key, id_, type_, prev, **kwargs):
         '''
         Return the index data entry string
         '''
         entry = {
             'r_key': self.entry_base(key),
-            'st': start,
-            'sz': size,
+            'st': kwargs['start'],
+            'sz': kwargs['size'],
             't': type_,
             'p': prev,
             }
@@ -401,8 +401,6 @@ class HDHT(object):
             table_entry,
             key,
             id_,
-            start,
-            size,
             type_,
             **kwargs):
         '''
@@ -412,8 +410,6 @@ class HDHT(object):
         raw, entry = self.index_entry(
             key,
             id_,
-            start,
-            size,
             type_,
             table_entry['prev'],
             **kwargs)
@@ -428,22 +424,18 @@ class HDHT(object):
             key,
             c_key,
             id_,
-            start,
-            size,
             type_,
             **kwargs):
         prev, entry = self.write_index_entry(
             table_entry,
             key,
             id_,
-            start,
-            size,
             type_,
             **kwargs)
         entry['rev'] = self.write_table_entry(table_entry, c_key, prev)
         return entry
 
-    def write_stor(self, table_entry, data, serial=None):
+    def write_doc_stor(self, table_entry, data, serial=None):
         '''
         Write the data to the storage file
         '''
@@ -454,7 +446,7 @@ class HDHT(object):
         table['fp'].seek(0, 2)
         start = table['fp'].tell()
         table['fp'].write(serial_data)
-        return start, len(serial_data)
+        return {'start': start, 'size': len(serial_data)}
 
     def read_stor(self, table_entry, start, size, serial=None):
         '''
