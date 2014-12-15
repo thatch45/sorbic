@@ -15,6 +15,7 @@ init-hook="
   aXIsICdTY3JpcHRzJyksICdhY3RpdmF0ZV90aGlzLnB5JykKCiAgICBleGVjZmlsZShhY3RpdmF0 \
   ZV90aGlzLCBkaWN0KF9fZmlsZV9fPWFjdGl2YXRlX3RoaXMpKQo='.decode('base64')"
 
+
 # Profiled execution.
 profile=no
 
@@ -27,32 +28,10 @@ persistent=yes
 
 # List of plugins (as comma separated values of python modules names) to load,
 # usually to register additional checkers.
-load-plugins=
-
-# DEPRECATED
-include-ids=no
-
-# DEPRECATED
-symbols=no
-
-# Use multiple processes to speed up Pylint.
-jobs=1
-
-# Allow loading of arbitrary C extensions. Extensions are imported into the
-# active Python interpreter and may run arbitrary code.
-unsafe-load-any-extension=no
-
-# A comma-separated list of package or module names from where C extensions may
-# be loaded. Extensions are loading into the active Python interpreter and may
-# run arbitrary code
-extension-pkg-whitelist=
+load-plugins=salttesting.pylintplugins.pep8,salttesting.pylintplugins.pep263,salttesting.pylintplugins.strings
 
 
 [MESSAGES CONTROL]
-
-# Only show warnings with the listed confidence levels. Leave empty to show
-# all. Valid levels: HIGH, INFERENCE, INFERENCE_FAILURE, UNDEFINED
-confidence=
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
@@ -68,7 +47,10 @@ confidence=
 # --enable=similarities". If you want to run only the classes checker, but have
 # no Warning level messages displayed, use"--disable=all --enable=classes
 # --disable=W"
-#disable=
+disable=C0330
+
+# Disabled Checks
+# C0330 (bad-continuation)
 
 
 [REPORTS]
@@ -99,7 +81,7 @@ comment=no
 
 # Template used to display messages. This is a python new-style format string
 # used to format the message information. See doc for all details
-#msg-template=
+msg-template='{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}'
 
 
 [VARIABLES]
@@ -113,11 +95,7 @@ dummy-variables-rgx=_|dummy
 
 # List of additional names supposed to be defined in builtins. Remember that
 # you should avoid to define new builtins when possible.
-additional-builtins=__opts__,__salt__,__pillar__,__grains__,__context__,__ret__,__env__,__active_provider_name__
-
-# List of strings which can identify a callback function by name. A callback
-# name must start or end with one of those strings.
-callbacks=cb_,_cb
+#additional-builtins=
 
 
 [FORMAT]
@@ -133,7 +111,7 @@ ignore-long-lines=^\s*(# )?<?https?://\S+>?$
 single-line-if-stmt=no
 
 # List of optional constructs for which whitespace checking is disabled
-no-space-check=trailing-comma,dict-separator
+#no-space-check=trailing-comma,dict-separator
 
 # Maximum number of lines in a module
 max-module-lines=3000
@@ -144,9 +122,6 @@ indent-string='    '
 
 # Number of spaces of indent required inside a hanging or continued line.
 indent-after-paren=4
-
-# Expected format of line ending, e.g. empty (any line ending), LF or CRLF.
-expected-line-ending-format=
 
 
 [LOGGING]
@@ -164,7 +139,7 @@ ignore-mixin-members=yes
 
 # List of module names for which member attributes should not be checked
 # (useful for modules/projects where namespaces are manipulated during runtime
-# and thus existing member attributes cannot be deduced by static analysis
+# and thus extisting member attributes cannot be deduced by static analysis
 ignored-modules=
 
 # List of classes names for which member attributes should not be checked
@@ -211,7 +186,8 @@ required-attributes=
 bad-functions=map,filter,apply,input
 
 # Good variable names which should always be accepted, separated by a comma
-good-names=i,j,k,ex,Run,_,log
+#good-names=i,j,k,ex,Run,_,log
+good-names=pk,vk,sk,_,log,nacl
 
 # Bad variable names which should always be refused, separated by a comma
 bad-names=foo,bar,baz,toto,tutu,tata
@@ -292,23 +268,6 @@ no-docstring-rgx=__.*__
 docstring-min-length=-1
 
 
-[SPELLING]
-
-# Spelling dictionary name. Available dictionaries: none. To make it working
-# install python-enchant package.
-spelling-dict=
-
-# List of comma separated words that should not be checked.
-spelling-ignore-words=
-
-# A path to a file that contains private dictionary; one word per line.
-spelling-private-dict-file=
-
-# Tells whether to store unknown words to indicated private dictionary in
-# --spelling-private-dict-file option instead of raising a message.
-spelling-store-unknown-words=no
-
-
 [CLASSES]
 
 # List of interface methods to ignore, separated by a comma. This is used for
@@ -323,10 +282,6 @@ valid-classmethod-first-arg=cls
 
 # List of valid names for the first argument in a metaclass class method.
 valid-metaclass-classmethod-first-arg=mcs
-
-# List of member names, which should be excluded from the protected access
-# warning.
-exclude-protected=_asdict,_fields,_replace,_source,_make
 
 
 [IMPORTS]
