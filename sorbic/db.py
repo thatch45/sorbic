@@ -53,12 +53,20 @@ class DB(object):
             self.fmt_map,
             self.header_len)
         self.write_stor_funcs = self.__gen_write_stor_funcs()
+        self.read_stor_funcs = self.__gen_read_stor_funcs()
 
     def __gen_write_stor_funcs(self):
         '''
         Return the storage write functions dict mapping to types
         '''
         return {'doc': self.index.write_doc_stor,
+                'file': None}
+
+    def __gen_read_stor_funcs(self):
+        '''
+        Return the storage read functions dict mapping to types
+        '''
+        return {'doc': self.index.read_doc_stor,
                 'file': None}
 
     def _get_db_meta(self):
@@ -79,16 +87,9 @@ class DB(object):
         with io.open(db_meta, 'w+b') as fp_:
             fp_.write(msgpack.dumps(meta))
 
-    def _get_storage(self, entries, doc_path):
-        stor = self.index.read_stor(
-                entries['table'],
-                entries['data']['st'],
-                entries['data']['sz'],
-                self.serial)
-        if doc_path:
-            return sorbic.utils.traverse.traverse_dict_and_list(stor, doc_path)
-        else:
-            return stor
+    def _get_storage(self, entries, **kwargs):
+        stor = self.read_stor_funcs[entries['data']['t']](entries, self.serial, **kwargs)
+        return stor
 
     def write_stor(self, table_entry, data, serial, type_):
         '''
@@ -125,7 +126,7 @@ class DB(object):
         '''
         return self.index.get_index_entry(key, id_, count)
 
-    def get(self, key, id_=None, meta=False, count=None, doc_path=''):
+    def get(self, key, id_=None, meta=False, count=None, **kwargs):
         '''
         Retrive a data entry
         '''
@@ -136,17 +137,17 @@ class DB(object):
             ret = []
             for index_entry in entries['data']:
                 meta_entries = {'table': entries['table'],'data': index_entry}
-                stor_ret = self._get_storage(meta_entries, doc_path)
+                stor_ret = self._get_storage(meta_entries, **kwargs)
                 if meta:
                     ret.append({'data': stor_ret, 'meta': index_entry})
                 else:
-                    ret.append(self._get_storage(meta_entries, doc_path))
+                    ret.append(self._get_storage(meta_entries, **kwargs))
             return ret
         if not meta:
-            return self._get_storage(entries, doc_path)
+            return self._get_storage(entries, **kwargs)
         else:
             ret = {}
-            ret['data'] = self._get_storage(entries, doc_path)
+            ret['data'] = self._get_storage(entries, **kwargs)
             ret['meta'] = entries
             return ret
 

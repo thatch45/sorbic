@@ -11,6 +11,7 @@ import hashlib
 
 # Import sorbic libs
 import sorbic.utils.rand
+import sorbic.utils.traverse
 import sorbic.stor.serial
 
 # Import Third Party Libs
@@ -448,13 +449,16 @@ class HDHT(object):
         table['fp'].write(serial_data)
         return {'start': start, 'size': len(serial_data)}
 
-    def read_stor(self, table_entry, start, size, serial=None):
+    def read_doc_stor(self, entries, serial=None, **kwargs):
         '''
         Read in the data
         '''
-        table = self.get_hash_table(table_entry['tfn'])
-        table['fp'].seek(start)
-        raw = table['fp'].read(size)
+        table = self.get_hash_table(entries['table']['tfn'])
+        table['fp'].seek(entries['data']['start'])
+        raw = table['fp'].read(entries['data']['size'])
         serial = serial if serial else self.serial.default
         serial_fun = getattr(self.serial, '{0}_load'.format(serial))
-        return serial_fun(raw)
+        ret = serial_fun(raw)
+        if kwargs.get('doc_path'):
+            return sorbic.utils.traverse.traverse_dict_and_list(ret, kwargs['doc_path'])
+        return ret
