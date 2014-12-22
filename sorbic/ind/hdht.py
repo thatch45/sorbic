@@ -172,8 +172,6 @@ class HDHT(object):
         '''
         entry = {
             'r_key': self.entry_base(key),
-            'st': kwargs['start'],
-            'sz': kwargs['size'],
             't': type_,
             'p': prev,
             }
@@ -447,15 +445,15 @@ class HDHT(object):
         table['fp'].seek(0, 2)
         start = table['fp'].tell()
         table['fp'].write(serial_data)
-        return {'start': start, 'size': len(serial_data)}
+        return {'st': start, 'sz': len(serial_data)}
 
     def read_doc_stor(self, entries, serial=None, **kwargs):
         '''
         Read in the data
         '''
         table = self.get_hash_table(entries['table']['tfn'])
-        table['fp'].seek(entries['data']['start'])
-        raw = table['fp'].read(entries['data']['size'])
+        table['fp'].seek(entries['data']['st'])
+        raw = table['fp'].read(entries['data']['sz'])
         serial = serial if serial else self.serial.default
         serial_fun = getattr(self.serial, '{0}_load'.format(serial))
         ret = serial_fun(raw)
