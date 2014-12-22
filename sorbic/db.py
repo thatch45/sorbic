@@ -6,7 +6,7 @@ import os
 import io
 # Import sorbic libs
 import sorbic.ind.hdht
-import sorbic.stor
+import sorbic.stor.files
 import sorbic.utils.traverse
 # Import third party libs
 import msgpack
@@ -60,14 +60,14 @@ class DB(object):
         Return the storage write functions dict mapping to types
         '''
         return {'doc': self.index.write_doc_stor,
-                'file': None}
+                'file': sorbic.stor.files.write}
 
     def __gen_read_stor_funcs(self):
         '''
         Return the storage read functions dict mapping to types
         '''
         return {'doc': self.index.read_doc_stor,
-                'file': None}
+                'file': sorbic.stor.files.read}
 
     def _get_db_meta(self):
         '''
