@@ -162,7 +162,7 @@ class DB(object):
         else:
             fn_root = self.index.entry_root('{0}/blank'.format(d_key))
         fn_ = os.path.join(fn_root, 'sorbic_table_{0}'.format(num))
-        trans_fn = os.path.join(fn_, '_trans')
+        trans_fn = os.path.join(fn_root, 'trans_table_{0}'.format(num))
         if os.path.exists(trans_fn):
             os.remove(trans_fn)
         trans_table = self.index.get_hash_table(trans_fn)
@@ -179,24 +179,32 @@ class DB(object):
         c_key = self.index.raw_crypt_key(entry['key'])
         i_entries = self.index.get_index_entry(entry['key'], count=0xffffffff)
         keeps = []
-        for ind in reversed(range(len(i_entries))):
-            i_entry = i_entries[ind]
+        for ind in reversed(range(len(i_entries['data']))):
+            i_entry = i_entries['data'][ind]
             if i_entry['_status'] != 'k':
                 continue
             keeps.append(i_entry)
         for i_entry in keeps:
             serial = i_entry.get('serial', self.serial)
-            stor = self._get_storage(i_entry)
+            stor = self._get_storage({
+                'table': i_entries['table'],
+                'data': i_entry})
+            tte = i_entries['table']
+            tte['tfn'] = trans_table['fp'].name
+            tte['prev'] = 0
             i_entry.update(self.write_stor(
-                trans_table,
+                tte,
                 stor,
                 serial,
-                i_entry['type']))
+                i_entry.get('type', 'doc')))
             kwargs = i_entry
             key = kwargs.pop('key')
             id_ = kwargs.pop('id')
-            type_ = kwargs.pop('type')
-            self.index.commit(trans_table, key, c_key, id_, type_, **kwargs)
+            if 'type' in kwargs:
+                type_ = kwargs.pop('type')
+            else:
+                type_ = 'doc'
+            self.index.commit(tte, key, c_key, id_, type_, **kwargs)
 
     def listdir(self, d_key):
         '''
