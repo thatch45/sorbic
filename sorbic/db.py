@@ -4,6 +4,7 @@ Interface to interact on a database level
 # Import python libs
 import os
 import io
+import shutil
 # Import sorbic libs
 import sorbic.ind.hdht
 import sorbic.stor.files
@@ -150,6 +151,52 @@ class DB(object):
             ret['data'] = self._get_storage(entries, **kwargs)
             ret['meta'] = entries
             return ret
+
+    def compress(self, d_key=None, num=None):
+        '''
+        Compress a single given index, remove any associated data
+        '''
+        fn_root = self.root
+        if not d_key or d_key == self.key_delim:
+            pass
+        else:
+            fn_root = self.index.entry_root('{0}/blank'.format(d_key))
+        fn_ = os.path.join(fn_root, 'sorbic_table_{0}'.format(num))
+        trans_fn = os.path.join(fn_, '_trans')
+        if os.path.exists(trans_fn):
+            os.remove(trans_fn)
+        trans_table = self.index.get_hash_table(trans_fn)
+        table = self.index.get_hash_table(fn_)
+        for entry in self.index._get_table_entries(fn_):
+            self._compress_entry(entry, table, trans_table)
+        shutil.move(trans_fn, fn_)
+
+    def _compress_entry(self, entry, table, trans_table):
+        '''
+        Read the table entries to keep out of the given entry and write them
+        fresh to the trans table
+        '''
+        c_key = self.index.raw_crypt_key(entry['key'])
+        i_entries = self.index.get_index_entry(entry['key'], count=0xffffffff)
+        keeps = []
+        for ind in reversed(range(len(i_entries))):
+            i_entry = i_entries[ind]
+            if i_entry['_status'] != 'k':
+                continue
+            keeps.append(i_entry)
+        for i_entry in keeps:
+            serial = i_entry.get('serial', self.serial)
+            stor = self._get_storage(i_entry)
+            i_entry.update(self.write_stor(
+                trans_table,
+                stor,
+                serial,
+                i_entry['type']))
+            kwargs = i_entry
+            key = kwargs.pop('key')
+            id_ = kwargs.pop('id')
+            type_ = kwargs.pop('type')
+            self.index.commit(trans_table, key, c_key, id_, type_, **kwargs)
 
     def listdir(self, d_key):
         '''

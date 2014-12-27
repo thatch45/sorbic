@@ -240,7 +240,9 @@ class HDHT(object):
         table['fp'].seek(prev)
         table['fp'].seek(prev)
         data_head = struct.unpack(IND_HEAD_FMT, table['fp'].read(3))
-        return msgpack.loads(table['fp'].read(data_head[0]))
+        index = msgpack.loads(table['fp'].read(data_head[0]))
+        index['_status'] = data_head[1]
+        return index
 
     def get_index_entry(self, key, id_=None, count=None):
         '''
@@ -438,18 +440,6 @@ class HDHT(object):
             **kwargs)
         entry['rev'] = self.write_table_entry(table_entry, c_key, prev)
         return entry
-
-    def compress(self, d_key, num):
-        '''
-        Compress a single given index, remove any associated data
-        '''
-        fn_root = self.root
-        if not d_key or d_key == self.key_delim:
-            pass
-        else:
-            fn_root = self.entry_root('{0}/blank'.format(d_key))
-        fn_ = os.path.join(fn_root, 'sorbic_table_{0}'.format(num))
-        table = self._get_hash_table(fn_)
 
     def write_doc_stor(self, table_entry, data, serial=None):
         '''
