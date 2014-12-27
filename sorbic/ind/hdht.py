@@ -17,6 +17,11 @@ import sorbic.stor.serial
 # Import Third Party Libs
 import msgpack
 
+# index header types:
+# k: "keep" the entry an the data
+# r: "remove" the entry and the data
+# e: "expired" remove the index entry but keep the data, another entry
+#    references it
 HEADER_DELIM = '_||_||_'
 IND_HEAD_FMT = '>Hc'
 
@@ -171,7 +176,7 @@ class HDHT(object):
         Return the index data entry string
         '''
         entry = {
-            'r_key': self.entry_base(key),
+            'key': key,
             't': type_,
             'p': prev,
             }
@@ -302,7 +307,7 @@ class HDHT(object):
                 continue
             ret = self._table_map(comps, table['fmt_map'])
             data = self._read_index_entry(table, ret['prev'])
-            ret['key'] = data['r_key']
+            ret['key'] = data['key']
             yield ret
 
     def rm_key(self, key, id_=None):
@@ -433,6 +438,18 @@ class HDHT(object):
             **kwargs)
         entry['rev'] = self.write_table_entry(table_entry, c_key, prev)
         return entry
+
+    def compress(self, d_key, num):
+        '''
+        Compress a single given index, remove any associated data
+        '''
+        fn_root = self.root
+        if not d_key or d_key == self.key_delim:
+            pass
+        else:
+            fn_root = self.entry_root('{0}/blank'.format(d_key))
+        fn_ = os.path.join(fn_root, 'sorbic_table_{0}'.format(num))
+        table = self._get_hash_table(fn_)
 
     def write_doc_stor(self, table_entry, data, serial=None):
         '''

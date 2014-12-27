@@ -39,7 +39,7 @@ class TestDB(unittest.TestCase):
         data = {1:2}
         db_.insert('foo/bar/baz', data)
         pull_data = db_.listdir('foo/bar')
-        self.assertEqual(pull_data[0]['key'], 'baz')
+        self.assertEqual(pull_data[0]['key'], 'foo/bar/baz')
         shutil.rmtree(w_dir)
 
     def test_json(self):
@@ -83,11 +83,10 @@ class TestDB(unittest.TestCase):
         db_ = sorbic.db.DB(root)
         data = {1:2}
         full_key = 'foo/bar/baz/key'
-        r_key = 'key'
         db_.insert(full_key, data)
         pull_data = db_.get(full_key, meta=True)
         self.assertEqual(data, pull_data['data'])
-        self.assertEqual(r_key, pull_data['meta']['data']['r_key'])
+        self.assertEqual(full_key, pull_data['meta']['data']['key'])
         shutil.rmtree(w_dir)
 
     def test_top_loc(self):
