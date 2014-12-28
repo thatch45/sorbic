@@ -34,3 +34,17 @@ def gen_id():
     '''
     r_time = time.time() * 1000000 - STD_EPOCH
     return struct.pack('>HQ', random.randint(0, 65535), r_time).encode('hex')
+
+
+def rand_dict():
+    '''
+    Populate a dict with random data, types etc for testing
+    '''
+    deep = random.randint(0, 100)
+    ret = {}
+    top = ret
+    for ind in range(deep):
+        key = rand_hex_str(random.randint(0, 50))
+        top[key] = {}
+        top = top[key]
+    return ret
