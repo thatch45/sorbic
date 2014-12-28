@@ -172,6 +172,10 @@ class DB(object):
             table_entries.append(entry)
         for entry in table_entries:
             self._compress_entry(entry, table, trans_table)
+        table['fp'].close()
+        trans_table['fp'].close()
+        self.index.tables.pop(fn_)
+        self.index.tables.pop(trans_fn)
         shutil.move(trans_fn, fn_)
 
     def _compress_entry(self, entry, table, trans_table):
