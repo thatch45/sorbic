@@ -4,6 +4,7 @@ Test core database functions
 '''
 # Import sorbic libs
 import sorbic.db
+import sorbic.utils.rand
 
 # Import python libs
 import os
@@ -205,3 +206,18 @@ class TestDB(unittest.TestCase):
         pull_data = db_.get('foo', doc_path='cheese:spam:bacon')
         self.assertEqual('end', pull_data)
         shutil.rmtree(w_dir)
+
+    def test_extra_index_data(self):
+        '''
+        Test adding arbitrary data to the index dataset
+        '''
+        w_dir = tempfile.mkdtemp()
+        root = os.path.join(w_dir, 'db_root')
+        db_ = sorbic.db.DB(root)
+        for _ in range(100)
+            data = sorbic.utils.rand.rand_dict()
+            ind_extra = sorbic.utils.rand.rand_dict()
+            top_key = next(iter(ind_extra))
+            db_.insert('foo', data, **ind_extra)
+            pull_data = db_.get('foo', meta=True)
+            self.assertIn(top_key, pull_data['meta']['data'])
