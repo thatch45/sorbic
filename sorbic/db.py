@@ -167,7 +167,10 @@ class DB(object):
             os.remove(trans_fn)
         table = self.index.get_hash_table(fn_)
         trans_table = self.index.get_hash_table(trans_fn)
+        table_entries = []
         for entry in self.index._get_table_entries(fn_):
+            table_entries.append(entry)
+        for entry in table_entries:
             self._compress_entry(entry, table, trans_table)
         shutil.move(trans_fn, fn_)
 
