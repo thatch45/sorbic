@@ -308,7 +308,9 @@ class HDHT(object):
             if not comps[0]:
                 continue
             ret = self._table_map(comps, table['fmt_map'])
+            table_start = table['fp'].tell()
             data = self._read_index_entry(table, ret['prev'])
+            table['fp'].seek(table_start)
             ret['key'] = data['key']
             yield ret
 

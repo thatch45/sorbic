@@ -165,8 +165,8 @@ class DB(object):
         trans_fn = os.path.join(fn_root, 'trans_table_{0}'.format(num))
         if os.path.exists(trans_fn):
             os.remove(trans_fn)
-        trans_table = self.index.get_hash_table(trans_fn)
         table = self.index.get_hash_table(fn_)
+        trans_table = self.index.get_hash_table(trans_fn)
         for entry in self.index._get_table_entries(fn_):
             self._compress_entry(entry, table, trans_table)
         shutil.move(trans_fn, fn_)
@@ -191,7 +191,6 @@ class DB(object):
                 'data': i_entry})
             tte = i_entries['table']
             tte['tfn'] = trans_table['fp'].name
-            tte['prev'] = 0
             i_entry.update(self.write_stor(
                 tte,
                 stor,

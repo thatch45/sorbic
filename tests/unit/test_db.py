@@ -43,6 +43,30 @@ class TestDB(unittest.TestCase):
         self.assertEqual(pull_data[0]['key'], 'foo/bar/baz')
         shutil.rmtree(w_dir)
 
+    def test_listdir_many(self):
+        '''
+        Test many entries in listdir
+        '''
+        w_dir = tempfile.mkdtemp()
+        root = os.path.join(w_dir, 'db_root')
+        db_ = sorbic.db.DB(root, hash_limit=0xfffff)
+        data = {1:2}
+        keys = set([
+            'foo/bar/1',
+            'foo/bar/2',
+            'foo/bar/3',
+            'foo/bar/4',
+            'foo/bar/5',
+            'foo/bar/6'])
+        for key in keys:
+            db_.insert(key, data)
+        pull_data = db_.listdir('foo/bar')
+        pull_set = set()
+        for chunk in pull_data:
+            pull_set.add(chunk['key'])
+        self.assertEqual(pull_set, keys)
+        shutil.rmtree(w_dir)
+
     def test_json(self):
         '''
         Test using json for index data
@@ -214,7 +238,7 @@ class TestDB(unittest.TestCase):
         w_dir = tempfile.mkdtemp()
         root = os.path.join(w_dir, 'db_root')
         db_ = sorbic.db.DB(root)
-        for _ in range(100)
+        for _ in range(100):
             data = sorbic.utils.rand.rand_dict()
             ind_extra = sorbic.utils.rand.rand_dict()
             top_key = next(iter(ind_extra))
