@@ -240,8 +240,14 @@ class TestDB(unittest.TestCase):
         db_ = sorbic.db.DB(root)
         for _ in range(100):
             data = sorbic.utils.rand.rand_dict()
-            ind_extra = sorbic.utils.rand.rand_dict()
-            top_key = next(iter(ind_extra))
+            while True:
+                try:
+                    ind_extra = sorbic.utils.rand.rand_dict()
+                    top_key = next(iter(ind_extra))
+                except StopIteration:
+                    # Bad generation of data
+                    continue
+                break
             db_.insert('foo', data, **ind_extra)
             pull_data = db_.get('foo', meta=True)
             self.assertIn(top_key, pull_data['meta']['data'])
