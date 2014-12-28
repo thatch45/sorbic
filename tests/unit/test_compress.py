@@ -35,7 +35,7 @@ class TestCompress(unittest.TestCase):
             self.assertEqual(data, pull_data)
         shutil.rmtree(w_dir)
 
-    def test_compress_no_changes_depth(self):
+    def _test_compress_no_changes_depth(self):
         '''
         Run a scale db execution with the given db kwargs
         '''
