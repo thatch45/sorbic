@@ -27,13 +27,13 @@ class TestCompress(unittest.TestCase):
         data = {1:1}
         for num in xrange(entries):
             key = str(num)
-            print(db.insert(key, data))
+            db.insert(key, data)
         db.compress('', 0)
         for num in xrange(entries):
             key = str(num)
             pull_data = db.get(key)
             self.assertEqual(data, pull_data)
-        #shutil.rmtree(w_dir)
+        shutil.rmtree(w_dir)
 
     def test_compress_no_changes_depth(self):
         '''
