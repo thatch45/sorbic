@@ -68,7 +68,7 @@ class TestCompress(unittest.TestCase):
             key = str(num)
             db.insert(key, data)
         for _ in xrange(entries):
-            rands.add(random.randint(0, entries))
+            rands.add(random.randint(0, entries - 1))
         for key in rands:
             db.rm(str(key))
         db.compress('', 0)
@@ -79,4 +79,28 @@ class TestCompress(unittest.TestCase):
                 self.assertIsNone(pull_data)
             else:
                 self.assertEqual(data, pull_data)
+        shutil.rmtree(w_dir)
+
+    def test_compress_changes_depth(self):
+        '''
+        Run a scale db execution with the given db kwargs
+        '''
+        entries = 100
+        w_dir = tempfile.mkdtemp()
+        root = os.path.join(w_dir, 'db_root')
+        db = sorbic.db.DB(root)
+        data = {1:1}
+        key = 'foo/bar'
+        ids = []
+        rm_ids = set()
+        for num in xrange(entries):
+            ids.append(db.insert(key, data)['id'])
+        for _ in xrange(entries):
+            rm_ids.add(ids[random.randint(0, entries - 1)])
+        for rm_id in rm_ids:
+            db.rm(key, rm_id)
+        db.compress('foo', 0)
+        for num in xrange(entries):
+            pull_data = db.get(key)
+            self.assertEqual(data, pull_data)
         shutil.rmtree(w_dir)
