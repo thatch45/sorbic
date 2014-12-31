@@ -185,6 +185,12 @@ class DB(object):
         '''
         c_key = self.index.raw_crypt_key(entry['key'])
         i_entries = self.index.get_index_entry(entry['key'], count=0xffffffff)
+        tte = {}
+        tte['tfn'] = trans_table['fp'].name
+        tte['key'] = i_entries['table']['key']
+        tte['prev'] = i_entries['table']['prev']
+        tte['pos'] = i_entries['table']['pos']
+        tte['rev'] = 0
         keeps = []
         for ind in reversed(range(len(i_entries['data']))):
             i_entry = i_entries['data'][ind]
@@ -193,11 +199,8 @@ class DB(object):
             keeps.append(i_entry)
         for i_entry in keeps:
             serial = i_entry.get('serial', self.serial)
-            stor = self._get_storage({
-                'table': i_entries['table'],
-                'data': i_entry})
-            tte = i_entries['table']
-            tte['tfn'] = trans_table['fp'].name
+            get_entries = {'table': i_entries['table'], 'data': i_entry}
+            stor = self._get_storage(get_entries)
             i_entry.update(self.write_stor(
                 tte,
                 stor,
@@ -211,6 +214,7 @@ class DB(object):
             else:
                 type_ = 'doc'
             self.index.commit(tte, key, c_key, id_, type_, **kwargs)
+            tte['rev'] += 1
 
     def listdir(self, d_key):
         '''
