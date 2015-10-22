@@ -5,6 +5,7 @@ Higherarchical Distributed Hash Table index
 # Import python libs
 import os
 import io
+import sys
 import shutil
 import struct
 import hashlib
@@ -16,6 +17,8 @@ import sorbic.stor.serial
 
 # Import Third Party Libs
 import msgpack
+
+IS_PY3 = sys.version_info >= (3,)
 
 # index header types:
 # k: "keep" the entry an the data
@@ -52,13 +55,20 @@ class HDHT(object):
         else:
             self.fmt_map = fmt_map
         self.root = root
+        if IS_PY3:
+            key_delim = key_delim.encode('utf-8')
         self.key_delim = key_delim
         self.hash_limit = hash_limit
         self.key_hash = key_hash
         self.header_len = header_len
         self.crypt_func = self.__crypt_func()
         self.key_size = self.__gen_key_size()
-        self.fmt = fmt.replace('K', str(self.key_size))
+        str_key_size = str(self.key_size)
+        if IS_PY3:
+            str_key_size = str_key_size.encode('utf-8')
+            self.fmt = fmt.encode('utf-8').replace(b'K', str_key_size)
+        else:
+            self.fmt = fmt.replace('K', str_key_size)
         self.bucket_size = self.__gen_bucket_size()
         self.serial = sorbic.stor.serial.Serial(serial)
         self.tables = {}
@@ -76,7 +86,10 @@ class HDHT(object):
         '''
         Return the length of the crypt_key
         '''
-        return len(self.raw_crypt_key('sorbic is awesome'))
+        string = 'sorbic is awesome'
+        if IS_PY3:
+            string = string.encode('utf-8')
+        return len(self.raw_crypt_key(string))
 
     def __gen_bucket_size(self):
         '''
@@ -85,7 +98,10 @@ class HDHT(object):
         args = []
         for arg in self.fmt_map:
             if arg == 'key':
-                args.append('0' * self.key_size)
+                key = '0' * self.key_size
+                if IS_PY3:
+                    key = key.encode('utf-8')
+                args.append(key)
             elif arg == 'prev':
                 args.append(1)
             elif arg == 'rev':
